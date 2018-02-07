@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "imposing-muse-193208",
+  "private_key_id": "2c9f46fc81b99a79d46e3f7fc377de6c298df690",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDlCJ9fb6l8Oib0\nQ2pnAJeRiherCadBKFeDuBBhAL4TW4QDX4WpcxaX4yL/bVm37OF0zGP0exxhRfxu\nUVQF90iZWm9ZxmVG/bWaLIFGTgiFzpDrPD+pFbROs/UEjZ/3jQe5m6u/5ClbXfUm\n0rBvpTeIT+7+C7spkoVGG89mNpx3UEmLJKG4HBxHwrvpIzuSUttbsU68ORLmskpp\nGwq1EWlhol1NVl4tO3DwaLWbZTBg9Zuo5vAYjKx6sqZesTrPR9EBFSzdaVufMjzz\n/JL8Zw/PzYSyyMwPV5R79bcjzrGDptplwxE7dJ67IhlQSgNpLSat4QCjUKLHOA5v\nESK1GSsXAgMBAAECggEAHcxgD+aol8UTybahDVhXtVPQ0yv6WtEzhwECVdyRiQCL\nIx/hIAlykxMLkU1aMu0wQtCk4JYekc6tPR0lCscAPGjhET5tcYMThu+WEjOXivEz\n4acru9qwZDJTBTiilhlUkU2JAaUJzHK5Bp1lieERDJHPImEcWhhPcVkE7uOED/G0\niEt6DYdqEtM9qVocaYOlWf2ey1L14D16guI/O39RBtInKy+XQh3wJuQ8C4psu2hs\neHaPHefrEzHvHMaTf3KrafBYbhpGqxwSd3PlkczmaSH1evFZBuf6UjaZi8V2Nu1d\n2kehvKA0NU90KzMR/6e2xWMbJkG02JCJZhZw/F0voQKBgQDynlOTCbEV+lcX5HNa\nz1GHxmzbe1R2WxUhCP5h1cEFnoOCpxnm8dqg4QhmGb3hbp9Rx2ibNXrtEqmvlAX4\n+PT9ybtZUZIBlYqKpl0AeVqRHU0RaETVW6g4ZRtvgFIQYcNl+rCNBxM0N03B5m3P\n24ZBvJUFhXd1WH8SGDjgJwDEBQKBgQDxqnwKXia+QkrXKRUQaQNcs3tZfCqrlMKr\nGx2ET7myPUfTkEvYLSvSwd0zNgpWauBmb8D0zEfM7G2dCk7bVh5MVSQxgZePCZzh\neW046Tbr9i79AvmJVC4kVwkA6YgEzG8uNsl1dyJr/Z1fx8vfZ+Qb/hcp30s2ps4Q\nMi5QpFPZawKBgQCnbzRmCQ45CKcKShKB3Ql7FikR3y8O7xTJ05calZW79wTzKbbq\ndoZW+HX/YEx2Qw2YNnGui13mNjb8gL8Ob2FDs/CjV3PXvAf8X4tXRGiINRx2ouq+\nA584LC6e6IO54n4i5rro2LUcF/6FjizCgdFJlIeTY+RpC0XGiwjVSJVysQKBgQCp\nTY+yz70Cw3yc+eoI4hj547/BtCxMol4y8z8dh6EHjsj4HXoVC6hM8YYfL3fUjPGC\nsj4TAd43YVd1klgmb1GwlmFR0YE1Mz3V9HShTzkr2/+VP3VEUVY2HUdwfSrOec5W\nKQnAImNaFoYfKODaNXVoav0dV5LgycFJNW6fDlCz2wKBgQDpoUT4bvn86ehYg0kd\nSjjBlzs2rgslbLS89taL88QpOUZe0GPWmntSzAvjrfdy36/NKbxfOCSaQ/T2/pvl\nNXyneJzmmAVSWbl5GpGLjGYZPvCYLl270lIpVj4KYFZDY5Bp5tCtLu9cXfqTjFIc\ntXEnJxU7S4W3rYJWXX6U5VU+tA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "election-nlp@imposing-muse-193208.iam.gserviceaccount.com",
+  "client_id": "114238285626848900749",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/election-nlp%40imposing-muse-193208.iam.gserviceaccount.com"
+}
