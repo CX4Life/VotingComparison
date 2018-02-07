@@ -17,4 +17,22 @@ or against those sentiments
 
 
 ###History
-- 1-27-2017 Initial Commit
+
+- 2-7-2018 At the suggestion of Dr. Hearne, looking to find some
+subset of census data to use to build up a profile of citizens in a
+congressional district.
+
+Inserted Representatives into the Representatives MySQL table.
+
+- 2-3-2018 Reviewed the OpenElections data, and discovered
+that the amount of data on ballot measures would be insufficient
+to perform a large scale analysis on the sentiments of voting
+precincts based on sentiment analysis of those ballot measure.
+We resolve to perform that same sentiment analysis on the
+the text of matters before Congress to create a profile of
+each Congressperson, and further use Census data to create a profile of
+that Congressperson's constituents. We will use these profiles to
+perform outlier detection on the interaction between Congresspeople and
+their constituents.
+
+- 1-27-2018 Initial Commit

@@ -1,5 +1,5 @@
 import json
-import mysql.connector
+import pymysql
 
 already_seen = set()
 HOSTNAME = 'localhost'
@@ -9,13 +9,12 @@ DB_NAME = 'VOTING'
 
 
 def insert_representative_into_table(rep):
-    conn = mysql.connector.connect(host=HOSTNAME, user=USERNAME, passwd=PASSWORD, db=DB_NAME)
+    global conn
     cur = conn.cursor()
-    cur.execute('SELECT Rep_ID FROM Represenatives')
-    for id in cur.fetchall():
-        print(id)
-
-    print('Done', rep)
+    updated = cur.execute(
+        "INSERT IGNORE INTO Representative VALUES (%s, %s, %s, %s);",
+        (rep['id'], rep['display_name'], rep['party'], rep['state']))
+    print('Done', rep['id'], updated)
 
 
 def update_representatives_table(json_filepath):
@@ -27,4 +26,14 @@ def update_representatives_table(json_filepath):
         for representative in every_vote[vote_result]:
             if representative['id'] not in already_seen:
                 insert_representative_into_table(representative)
-                exit(0)
+
+
+def main():
+    global conn
+    conn = pymysql.connect(host=HOSTNAME, user=USERNAME, passwd=PASSWORD, db=DB_NAME)
+    update_representatives_table('sample_data.json')
+    conn.commit()
+    conn.close()
+
+if __name__ == '__main__':
+    main()
