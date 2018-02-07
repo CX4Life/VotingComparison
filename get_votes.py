@@ -9,6 +9,7 @@ __copyright__ = 'Copyright (c) 2018 Alexander Lee, Tim Woods'
 __license__ = 'MIT'
 
 import os
+import insert_all_reps
 
 USERS_HOME_DIR = os.environ['HOME']
 CONGRESS_WORKING_DIR = USERS_HOME_DIR + '/CS477/congress'
@@ -31,11 +32,24 @@ def get_all_json_files(session, year):
 
 def main():
     session_years = [
-        ('110', '2010')
+        ('110', '2008'),
+        ('111', '2009'),
+        ('111', '2010'),
+        ('112', '2011'),
+        ('112', '2012'),
+        ('113', '2013'),
+        ('113', '2014'),
+        ('114', '2015'),
+        ('114', '2016'),
+        ('115', '2017'),
+        ('115', '2018')
     ]
     for sess_year in session_years:
         votes_this_year = get_all_json_files(*sess_year)
-
+        print(len(votes_this_year))
+        assert False
+        for json_vote_file in votes_this_year:
+            insert_all_reps.update_representatives_table(json_vote_file)
 
 if __name__ == '__main__':
     main()
