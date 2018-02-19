@@ -37,7 +37,7 @@ def return_representatives(json_file):
     vote_object = json.load(json_file)
     every_vote = vote_object['votes']
     for vote_type in every_vote.keys():
-        ret.append(x for x in every_vote[vote_type])
+        ret.extend([x for x in every_vote[vote_type]])
     return ret
 
 
@@ -69,3 +69,13 @@ def update_representatives_table(json_filepath, set_of_representatives=None):
 
     conn.commit()
     conn.close()
+
+
+def main():
+    with open('sample_data.json', 'r') as jfile:
+        reps = return_representatives(jfile)
+        for r in reps:
+            print(r['id'])
+
+if __name__ == '__main__':
+    main()
