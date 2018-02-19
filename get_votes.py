@@ -67,6 +67,27 @@ def load_params():
     return ret
 
 
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 60, fill = '█'):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    # Print New Line on Complete
+    if iteration == total:
+        print()
+
+
 def main():
     write_params_if_not_present()
     session_years = load_params()
@@ -79,17 +100,18 @@ def main():
         sess_year = session_years[-1]
         session_years = session_years[:-1]
         votes_this_year = get_all_json_files(*sess_year)
-        print('Votes in year:', len(votes_this_year))
-        try:
-            for json_vote_file in votes_this_year:
+        total_votes = len(votes_this_year)
+        for i, json_vote_file in enumerate(votes_this_year):
+            printProgressBar(i, total_votes, str(sess_year[0]) + ' ' + str(sess_year[1]))
+            try:
                 insert_all_reps.update_representatives_table(json_vote_file)
-        except ValueError:
-            errors.append(sess_year)
-            continue
-        finally:
-            if errors:
-                print('sessions in error:')
-                print(errors)
+            except ValueError:
+                errors.append(sess_year)
+                continue
+
+        if errors:
+            print('sessions in error:')
+            print(errors)
             write_params_after_db_update(session_years, errors)
 
 

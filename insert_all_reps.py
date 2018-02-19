@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 import pymysql
 
 already_seen = set()
@@ -6,6 +7,7 @@ HOSTNAME = 'localhost'
 USERNAME = 'root'
 PASSWORD = 'aImFB83ClwKyoolJ'
 DB_NAME = 'VOTING'
+LOG_FILE = 'updated_id.txt'
 
 
 def clean_fetched_ID(id):
@@ -28,8 +30,8 @@ def insert_representative_into_table(rep, conn):
     updated = cur.execute(
         "INSERT IGNORE INTO Representative VALUES (%s, %s, %s, %s);",
         (rep['id'], rep['display_name'], rep['party'], rep['state']))
-    print('Done', rep['id'], updated)
-
+    with open(LOG_FILE, 'r') as log:
+        log.write('{}: Added {}'.format(datetime.now(), rep['id']))
 
 def return_representatives(json_file):
     ret = []
