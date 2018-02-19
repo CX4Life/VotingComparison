@@ -14,11 +14,6 @@ def yaml_dump(filepath, data):
     with open(filepath, 'w') as current:
         yaml.dump(data, current)
 
-#txt = doc['- id']['bioguide']
-
-
-#legislators-current.yaml
-
 def main():
     filepath = 'legislators-current.yaml'
     data = yaml_loader(filepath)
