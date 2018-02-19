@@ -31,19 +31,41 @@ def insert_representative_into_table(rep, conn):
     print('Done', rep['id'], updated)
 
 
-def update_representatives_table(json_filepath):
+def return_representatives(json_file):
+    ret = []
+
+    vote_object = json.load(json_file)
+    every_vote = vote_object['votes']
+    for vote_type in every_vote.keys():
+        ret.append(x for x in every_vote[vote_type])
+    return ret
+
+
+def update_representatives_table(json_filepath, set_of_representatives=None):
     global already_seen
     conn = pymysql.connect(host=HOSTNAME, user=USERNAME, passwd=PASSWORD, db=DB_NAME)
     already_seen = select_existing_representatives(conn)
 
-    with open(json_filepath, 'r') as j_file:
-        vote_object = json.load(j_file)
+    # if this method is called with a collection of representatives,
+    # do the insert using that set of representatives instead of collecting those representatives
+    # from the JSON file.
+    if set_of_representatives is not None:
+        for representative in set_of_representatives:
+            insert_representative_into_table(representative)
+        return
 
-    every_vote = vote_object['votes']
-    for vote_result in every_vote.keys():
-        for representative in every_vote[vote_result]:
+    with open(json_filepath, 'r') as j_file:
+        every_representative = return_representatives(j_file)
+
+    for representative in every_representative:
+        try:
             if representative['id'] not in already_seen:
                 insert_representative_into_table(representative, conn)
+        except ValueError:
+            print('error on rep id')
+            print(representative)
+            raise ValueError
+
 
     conn.commit()
     conn.close()
