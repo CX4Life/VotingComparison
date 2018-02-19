@@ -61,7 +61,7 @@ def update_representatives_table(json_filepath, set_of_representatives=None):
         try:
             if representative['id'] not in already_seen:
                 insert_representative_into_table(representative, conn)
-        except ValueError:
+        except TypeError:
             print('error on rep id')
             print(representative)
             raise ValueError
