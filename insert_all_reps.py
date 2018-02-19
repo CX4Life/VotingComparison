@@ -43,7 +43,7 @@ def return_representatives(json_file):
 
 def update_representatives_table(json_filepath, set_of_representatives=None):
     global already_seen
-    conn = pymysql.connect(host=HOSTNAME, user=USERNAME, passwd=PASSWORD, db=DB_NAME)
+    conn = pymysql.connect(host=HOSTNAME, port=3336, user=USERNAME, passwd=PASSWORD, db=DB_NAME)
     already_seen = select_existing_representatives(conn)
 
     # if this method is called with a collection of representatives,
@@ -58,6 +58,8 @@ def update_representatives_table(json_filepath, set_of_representatives=None):
         every_representative = return_representatives(j_file)
 
     for representative in every_representative:
+        if representative == 'VP':
+            continue
         try:
             if representative['id'] not in already_seen:
                 insert_representative_into_table(representative, conn)
