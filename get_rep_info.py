@@ -15,11 +15,19 @@ def yaml_dump(filepath, data):
         yaml.dump(data, current)
 
 def main():
-    filepath = 'legislators-current.yaml'
-    data = yaml_loader(filepath)
+    sample = 'rep_info/legislators-sample.yaml'
+    historic = 'rep_info/legislators-historical.yaml'
+    current = 'rep_info/legislators-current.yaml'
+
+    data = yaml_loader(sample)
 
     for x in data:
-        print("%s %s %s" % (x['id']['bioguide'], x['name']['first'], x['name']['last']))
+        print("%s %s %s" % (x['id']['bioguide'], x['name']['first'], x['name']['last'],))
+        for term in x['terms']:
+            if term['type'] == 'rep':
+                print("\t%s: %s %s %s district %s" % (term['type'], term['start'], term['end'], term['state'], term['district']))
+            elif term['type'] == 'sen':
+                print("\t%s: %s %s %s" % (term['type'], term['start'], term['end'], term['state']))
 
 if __name__ == "__main__":
     main()
