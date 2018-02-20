@@ -1,7 +1,17 @@
 # https://github.com/unitedstates/congress-legislators
 
+'''
+TERMS
+repid
+type
+start
+end
+state
+district (null if sen)
+'''
+
 from yaml import load, dump
-from datetime import date
+from datetime import date, datetime
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -16,7 +26,7 @@ def yaml_loader(filepath):
 
 def yaml_dump(filepath, data):
     with open(filepath, 'w') as current:
-        yaml.dump(data, current)
+        dump(data, current, default_flow_style=False)
 
 def print_districts(filepath):
     data = yaml_loader(filepath)
@@ -58,13 +68,35 @@ def print_recent_districts(filepath):
                     print("\t%s: %s %s %s district %s" % (
                         term['type'], term['start'], term['end'], term['state'], term['district']))
 
+#not deleting terms
+def trim(filepath):
+    data = yaml_loader(filepath)
+
+    for x in data:
+        # district = 0
+        # first = True
+        for term in x['terms']:
+            # if term['type'] == 'rep':
+            '''
+            if first:
+                district = term['district']
+                first = False
+            elif district != term['district']:
+                district = term['district']
+            '''
+        if datetime.strptime(term['start'], "%Y-%m-%d") <= datetime(2007, 12, 5):
+            del term
+
+    yaml_dump("dumpfile.yaml", data)
 
 def main():
     sample = 'rep_info/legislators-sample.yaml'
     historic = 'rep_info/legislators-historical.yaml'
     current = 'rep_info/legislators-current.yaml'
 
-    print_changed_districts(current)
+    #print_changed_districts(current)
+    trim(current)
+
 
 
 if __name__ == "__main__":
