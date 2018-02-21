@@ -11,6 +11,7 @@ district (null if sen)
 '''
 
 from yaml import load, dump
+import json
 from datetime import date, datetime
 
 try:
@@ -19,17 +20,17 @@ except ImportError:
     from yaml import Loader, Dumper
 
 
-def yaml_loader(filepath):
+def json_loader(filepath):
     with open(filepath, 'r') as current:
-        return load(current, Loader=Loader)
+        return json.load(current)
 
 
-def yaml_dump(filepath, data):
+def json_dump(filepath, data):
     with open(filepath, 'w') as current:
-        dump(data, current, default_flow_style=False)
+        json.dump(data, current, indent=4)
 
 def print_districts(filepath):
-    data = yaml_loader(filepath)
+    data = json_loader(filepath)
 
     for x in data:
         print("%s %s %s" % (x['id']['bioguide'], x['name']['first'], x['name']['last'],))
@@ -41,7 +42,7 @@ def print_districts(filepath):
                 print("\t%s: %s %s %s" % (term['type'], term['start'], term['end'], term['state']))
 
 def print_changed_districts(filepath):
-    data = yaml_loader(filepath)
+    data = json_loader(filepath)
 
     for x in data:
         district = 0
@@ -58,7 +59,7 @@ def print_changed_districts(filepath):
                             x['id']['bioguide'], x['name']['first'], x['name']['last'],))
 
 def print_recent_districts(filepath):
-    data = yaml_loader(filepath)
+    data = json_loader(filepath)
 
     for x in data:
         print("%s %s %s" % (x['id']['bioguide'], x['name']['first'], x['name']['last'],))
@@ -70,12 +71,13 @@ def print_recent_districts(filepath):
 
 #not deleting terms
 def trim(filepath):
-    data = yaml_loader(filepath)
+    data = json_loader(filepath)
 
-    for x in data:
+    for rep in data:
         # district = 0
         # first = True
-        for term in x['terms']:
+        terms = rep['terms']
+        for term in terms:
             # if term['type'] == 'rep':
             '''
             if first:
@@ -84,15 +86,17 @@ def trim(filepath):
             elif district != term['district']:
                 district = term['district']
             '''
-        if datetime.strptime(term['start'], "%Y-%m-%d") <= datetime(2007, 12, 5):
-            del term
+            date = datetime.strptime(term['start'], "%Y-%m-%d")
+            if date < datetime(2007, 12, 5):
+                #print ("start %s" % term['start'])
+                del term
 
-    yaml_dump("dumpfile.yaml", data)
+    json_dump("dumpfile.json", data)
 
 def main():
-    sample = 'rep_info/legislators-sample.yaml'
-    historic = 'rep_info/legislators-historical.yaml'
-    current = 'rep_info/legislators-current.yaml'
+    #sample = 'rep_info/legislators-sample.json'
+    historic = 'rep_info/legislators-historical.json'
+    current = 'rep_info/legislators-current.json'
 
     #print_changed_districts(current)
     trim(current)
