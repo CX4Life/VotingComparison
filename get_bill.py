@@ -31,7 +31,7 @@ def main():
     congress = "113"
     bill = "2217"
     type = "hr"
-    bill_json = get_bill(congress, bill, type)
+    print(get_bill(congress, bill, type))
 
 
 if __name__ == '__main__':
