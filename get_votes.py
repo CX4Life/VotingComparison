@@ -112,7 +112,7 @@ def main():
         if errors:
             print('sessions in error:')
             print(errors)
-            write_params_after_db_update(session_years, errors)
+        write_params_after_db_update(session_years, errors)
 
 
 if __name__ == '__main__':

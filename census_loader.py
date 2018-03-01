@@ -2,6 +2,9 @@ import pymysql
 import os
 import csv
 import time
+import json
+import random
+import statistics
 from functools import wraps
 
 __license__ = 'MIT'
@@ -31,6 +34,27 @@ class AgeInfo:
         self.median,\
         self._18_plus,\
         self._65_plus = age_data
+        self.average = None
+        self.stddev = None
+        self.create_distribution()
+
+    def create_distribution(self):
+        randomized_ages = []
+        randomized_ages.extend([random.randint(0, 5) for x in range(self._under_5)])
+        randomized_ages.extend([random.randint(5, 10) for x in range(self._5_to_9)])
+        randomized_ages.extend([random.randint(10, 15) for x in range(self._10_to_14)])
+        randomized_ages.extend([random.randint(15, 20) for x in range(self._15_to_19)])
+        randomized_ages.extend([random.randint(20, 25) for x in range(self._20_to_24)])
+        randomized_ages.extend([random.randint(25, 35) for x in range(self._25_to_34)])
+        randomized_ages.extend([random.randint(35, 45) for x in range(self._35_to_44)])
+        randomized_ages.extend([random.randint(45, 55) for x in range(self._45_to_54)])
+        randomized_ages.extend([random.randint(55, 60) for x in range(self._55_to_59)])
+        randomized_ages.extend([random.randint(60, 65) for x in range(self._60_to_64)])
+        randomized_ages.extend([random.randint(65, 75) for x in range(self._65_to_74)])
+        randomized_ages.extend([random.randint(75, 85) for x in range(self._75_to_84)])
+        randomized_ages.extend([random.randint(85, 95) for x in range(self._85_plus)])
+        self.average = sum(randomized_ages) / len(randomized_ages)
+        self.stddev = statistics.stdev(randomized_ages)
 
     def show_stuff(self):
         print(self.total)
@@ -69,6 +93,22 @@ class IncomeInfo:
         self.over_200,\
         self.median,\
         self.mean = income_data
+        self.create_distribution()
+
+    def create_distribution(self):
+        incomes = []
+        incomes.extend([random.randint(0, 10000) for _ in range(self.under_10)])
+        incomes.extend([random.randint(10000, 15000) for _ in range(self.under_10)])
+        incomes.extend([random.randint(15000, 25000) for _ in range(self._10_to_14)])
+        incomes.extend([random.randint(25000, 35000) for _ in range(self._25_to_34)])
+        incomes.extend([random.randint(35000, 50000) for _ in range(self._35_to_49)])
+        incomes.extend([random.randint(50000, 75000) for _ in range(self._50_to_74)])
+        incomes.extend([random.randint(75000, 100000) for _ in range(self._75_to_99)])
+        incomes.extend([random.randint(100000, 150000) for _ in range(self._100_to_149)])
+        incomes.extend([random.randint(150000, 200000) for _ in range(self._150_to_199)])
+        incomes.extend([random.randint(200000, 300000) for _ in range(self.over_200)])
+        self.average = statistics.mean(incomes)
+        self.stddev = statistics.stdev(incomes)
 
 
 def get_all_csvs():
@@ -189,10 +229,10 @@ def most_under_10k(income_dict):
 
 def main():
     age_dict, income_dict = create_dictionaries()
-    most_under_10k(income_dict)
-    most_over_200k(income_dict)
-
-
+    with open("age_data.json", "w") as age_output:
+        json.dump(age_dict, age_output)
+    with open("income_data.json", "w") as income_output:
+        json.dump(income_dict, income_output)
     # income_dict = create_income_dictionary()
 
 
