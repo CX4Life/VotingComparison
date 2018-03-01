@@ -1,4 +1,3 @@
-import pymysql
 import os
 import csv
 import time
@@ -6,53 +5,117 @@ import json
 import random
 import statistics
 from functools import wraps
+from get_votes import printProgressBar
 
 __license__ = 'MIT'
 
 PATH_TO_CSVS = 'census/'
 
+STATE_LOOKUP = {
+    'ALABAMA': 'AL',
+    'ALASKA': 'AK',
+    'ARIZONA': 'AZ',
+    'ARKANSAS': 'AR',
+    'CALIFORNIA': 'CA',
+    'COLORADO': 'CO',
+    'CONNECTICUT': 'CT',
+    'DELAWARE': 'DE',
+    'DISTRICT OF COLUMBIA': 'DC',
+    'FLORIDA': 'FL',
+    'GEORGIA': 'GA',
+    'HAWAII': 'HI',
+    'IDAHO': 'ID',
+    'ILLINOIS': 'IL',
+    'INDIANA': 'IN',
+    'IOWA': 'IA',
+    'KANSAS': 'KS',
+    'KENTUCKY': 'KY',
+    'LOUISIANA': 'LA',
+    'MAINE': 'ME',
+    'MARYLAND': 'MD',
+    'MASSACHUSETTS': 'MA',
+    'MICHIGAN': 'MI',
+    'MINNESOTA': 'MN',
+    'MISSISSIPPI': 'MS',
+    'MISSOURI': 'MO',
+    'MONTANA': 'MT',
+    'NEBRASKA': 'NE',
+    'NEVADA': 'NV',
+    'NEW HAMPSHIRE': 'NH',
+    'NEW JERSEY': 'NJ',
+    'NEW MEXICO': 'NM',
+    'NEW YORK': 'NY',
+    'NORTH CAROLINA': 'NC',
+    'NORTH DAKOTA': 'ND',
+    'OHIO': 'OH',
+    'OKLAHOMA': 'OK',
+    'OREGON': 'OR',
+    'PENNSYLVANIA': 'PA',
+    'RHODE ISLAND': 'RI',
+    'SOUTH CAROLINA': 'SC',
+    'SOUTH DAKOTA': 'SD',
+    'TENNESSEE': 'TN',
+    'TEXAS': 'TX',
+    'UTAH': 'UT',
+    'VERMONT': 'VT',
+    'VIRGINIA': 'VA',
+    'WASHINGTON': 'WA',
+    'WEST VIRGINIA': 'WV',
+    'WISCONSIN': 'WI',
+    'WYOMING': 'WY'
+}
+
+
+class Encoder (json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, AgeInfo):
+            return {'age': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
+        elif isinstance(obj, IncomeInfo):
+            return {'income': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
+        return json.JSONEncoder.default(self, obj)
+
 
 class AgeInfo:
-    def __init__(self, age_data):
-        #TODO off by one, only loading first district
-        self.total,\
-        self.male,\
-        self.female,\
-        self._under_5,\
-        self._5_to_9,\
-        self._10_to_14,\
-        self._15_to_19,\
-        self._20_to_24,\
-        self._25_to_34,\
-        self._35_to_44,\
-        self._45_to_54,\
-        self._55_to_59,\
-        self._60_to_64,\
-        self._65_to_74,\
-        self._75_to_84,\
-        self._85_plus,\
-        self.median,\
-        self._18_plus,\
-        self._65_plus = age_data
+    def __init__(self, age_data, name):
+        self.name = name
+        self.total, \
+            self.male, \
+            self.female, \
+            self._under_5, \
+            self._5_to_9, \
+            self._10_to_14, \
+            self._15_to_19, \
+            self._20_to_24, \
+            self._25_to_34, \
+            self._35_to_44, \
+            self._45_to_54, \
+            self._55_to_59, \
+            self._60_to_64, \
+            self._65_to_74, \
+            self._75_to_84, \
+            self._85_plus, \
+            self.median, \
+            self._18_plus, \
+            self._65_plus = age_data
         self.average = None
         self.stddev = None
         self.create_distribution()
 
     def create_distribution(self):
         randomized_ages = []
-        randomized_ages.extend([random.randint(0, 5) for x in range(self._under_5)])
-        randomized_ages.extend([random.randint(5, 10) for x in range(self._5_to_9)])
-        randomized_ages.extend([random.randint(10, 15) for x in range(self._10_to_14)])
-        randomized_ages.extend([random.randint(15, 20) for x in range(self._15_to_19)])
-        randomized_ages.extend([random.randint(20, 25) for x in range(self._20_to_24)])
-        randomized_ages.extend([random.randint(25, 35) for x in range(self._25_to_34)])
-        randomized_ages.extend([random.randint(35, 45) for x in range(self._35_to_44)])
-        randomized_ages.extend([random.randint(45, 55) for x in range(self._45_to_54)])
-        randomized_ages.extend([random.randint(55, 60) for x in range(self._55_to_59)])
-        randomized_ages.extend([random.randint(60, 65) for x in range(self._60_to_64)])
-        randomized_ages.extend([random.randint(65, 75) for x in range(self._65_to_74)])
-        randomized_ages.extend([random.randint(75, 85) for x in range(self._75_to_84)])
-        randomized_ages.extend([random.randint(85, 95) for x in range(self._85_plus)])
+        randomized_ages.extend([random.randint(0, 5) for _ in range(self._under_5)])
+        randomized_ages.extend([random.randint(5, 10) for _ in range(self._5_to_9)])
+        randomized_ages.extend([random.randint(10, 15) for _ in range(self._10_to_14)])
+        randomized_ages.extend([random.randint(15, 20) for _ in range(self._15_to_19)])
+        randomized_ages.extend([random.randint(20, 25) for _ in range(self._20_to_24)])
+        randomized_ages.extend([random.randint(25, 35) for _ in range(self._25_to_34)])
+        randomized_ages.extend([random.randint(35, 45) for _ in range(self._35_to_44)])
+        randomized_ages.extend([random.randint(45, 55) for _ in range(self._45_to_54)])
+        randomized_ages.extend([random.randint(55, 60) for _ in range(self._55_to_59)])
+        randomized_ages.extend([random.randint(60, 65) for _ in range(self._60_to_64)])
+        randomized_ages.extend([random.randint(65, 75) for _ in range(self._65_to_74)])
+        randomized_ages.extend([random.randint(75, 85) for _ in range(self._75_to_84)])
+        randomized_ages.extend([random.randint(85, 95) for _ in range(self._85_plus)])
         self.average = sum(randomized_ages) / len(randomized_ages)
         self.stddev = statistics.stdev(randomized_ages)
 
@@ -79,20 +142,23 @@ class AgeInfo:
 
 
 class IncomeInfo:
-    def __init__(self, income_data):
-        self.total,\
-        self.under_10,\
-        self._10_to_14,\
-        self._15_to_24,\
-        self._25_to_34,\
-        self._35_to_49,\
-        self._50_to_74,\
-        self._75_to_99,\
-        self._100_to_149,\
-        self._150_to_199,\
-        self.over_200,\
-        self.median,\
-        self.mean = income_data
+    def __init__(self, income_data, name):
+        self.total, \
+            self.under_10, \
+            self._10_to_14, \
+            self._15_to_24, \
+            self._25_to_34, \
+            self._35_to_49, \
+            self._50_to_74, \
+            self._75_to_99, \
+            self._100_to_149, \
+            self._150_to_199, \
+            self.over_200, \
+            self.median, \
+            self.mean = income_data
+        self.name = name
+        self.average = None
+        self.stddev = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -111,7 +177,7 @@ class IncomeInfo:
         self.stddev = statistics.stdev(incomes)
 
 
-def get_all_csvs():
+def get_all_csv_file_names():
     return os.listdir(PATH_TO_CSVS)
 
 
@@ -172,25 +238,36 @@ def get_distributions_from_csv(opened_csv):
             income_data.append(district_values_from_row(row))
     assert age_data and income_data
     return convert_to_list_of_districts(age_data), \
-           convert_to_list_of_districts(income_data)
+        convert_to_list_of_districts(income_data)
+
+
+def get_state_abbreviation_from_filename(filename):
+    before_district = filename.split('_District')[0]
+    before_all = before_district.split('_All')[0]
+    key = ' '.join(before_all.split('_')).upper()
+    return STATE_LOOKUP[key]
 
 
 def create_dictionaries():
-    every_csv = get_all_csvs()
+    every_csv = get_all_csv_file_names()
     state_district_ages = {}
     state_district_incomes = {}
 
-    for csv_filename in every_csv:
-        state_name = csv_filename.split('_')[0]
+    for count, csv_filename in enumerate(every_csv):
+        printProgressBar(count, len(every_csv) - 1, 'Processing census data')
+
+        state_name = get_state_abbreviation_from_filename(csv_filename)
         state_district_ages[state_name] = {}
         state_district_incomes[state_name] = {}
         with open(PATH_TO_CSVS + csv_filename, 'r') as opened_csv:
             state_age_data, state_income_data = get_distributions_from_csv(opened_csv)
             for i, (age, income) in enumerate(zip(state_age_data, state_income_data)):
-                age_object = AgeInfo(age)
-                income_object = IncomeInfo(income)
-                state_district_ages[state_name][i + 1] = age_object
-                state_district_incomes[state_name][i + 1] = income_object
+                num_string = str(i + 1).zfill(2)
+                district_name = state_name + num_string
+                age_object = AgeInfo(age, district_name)
+                income_object = IncomeInfo(income, district_name)
+                state_district_ages[state_name][num_string] = age_object
+                state_district_incomes[state_name][num_string] = income_object
 
     return state_district_ages, state_district_incomes
 
@@ -203,7 +280,7 @@ def most_over_200k(income_dict):
     for state in income_dict.keys():
         for district in income_dict[state].keys():
             rich_people_here = income_dict[state][district].over_200
-            if  rich_people_here > max_over_200:
+            if rich_people_here > max_over_200:
                 s = state
                 d = district
                 max_over_200 = rich_people_here
@@ -227,12 +304,16 @@ def most_under_10k(income_dict):
     print('Most under 10k', s, d, max_under_10)
 
 
+def pretty_dump_to_json_file(obj, openfile):
+    json.dump(obj, openfile, sort_keys=True, indent=2, cls=Encoder)
+
+
 def main():
     age_dict, income_dict = create_dictionaries()
     with open("age_data.json", "w") as age_output:
-        json.dump(age_dict, age_output)
+        pretty_dump_to_json_file(age_dict, age_output)
     with open("income_data.json", "w") as income_output:
-        json.dump(income_dict, income_output)
+        pretty_dump_to_json_file(income_dict, income_output)
     # income_dict = create_income_dictionary()
 
 
