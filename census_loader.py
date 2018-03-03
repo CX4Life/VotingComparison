@@ -4,6 +4,7 @@ import time
 import json
 import random
 import statistics
+import threading
 from functools import wraps
 from get_votes import printProgressBar
 
@@ -266,11 +267,18 @@ def get_state_abbreviation_from_filename(filename):
     key = ' '.join(before_all.split('_')).upper()
     return STATE_LOOKUP[key]
 
+
+def update_dicts_by_thread(age_dict, income_dict, state, num, age, income, name):
+    age_dict[state][num] = AgeInfo(age, name)
+    income_dict[state][num] = IncomeInfo(income, num)
+
+
 @timed
 def create_dictionaries():
     every_csv = get_all_csv_file_names()
     state_district_ages = {}
     state_district_incomes = {}
+    thread_pool = []
 
     for count, csv_filename in enumerate(every_csv):
         printProgressBar(count, len(every_csv) - 1, 'Processing census data')
@@ -283,10 +291,19 @@ def create_dictionaries():
             for i, (age, income) in enumerate(zip(state_age_data, state_income_data)):
                 num_string = str(i + 1).zfill(2)
                 district_name = state_name + num_string
-                age_object = AgeInfo(age, district_name)
-                income_object = IncomeInfo(income, district_name)
-                state_district_ages[state_name][num_string] = age_object
-                state_district_incomes[state_name][num_string] = income_object
+                t = threading.Thread(target=update_dicts_by_thread,
+                                                    args=(state_district_ages,
+                                                          state_district_incomes,
+                                                          state_name,
+                                                          num_string,
+                                                          age,
+                                                          income,
+                                                          district_name,))
+                thread_pool.append(t)
+                t.start()
+
+    for thread in thread_pool:
+        thread.join()
 
     return state_district_ages, state_district_incomes
 
