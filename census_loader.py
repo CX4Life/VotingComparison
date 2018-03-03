@@ -68,10 +68,16 @@ STATE_LOOKUP = {
 
 class Encoder (json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, AgeInfo):
-            return {'age': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
-        elif isinstance(obj, IncomeInfo):
-            return {'income': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
+        if isinstance(obj, AgeInfo) or isinstance(obj, IncomeInfo):
+            sub_dict = {'name': obj.name,
+                        'average': obj.average,
+                        'stddev': obj.stddev,
+                        'first_quart': obj.first_quart,
+                        'third_quart': obj.third_quart
+                        }
+            if isinstance(obj, AgeInfo):
+                return {'age': sub_dict}
+            return {'income': sub_dict}
         return json.JSONEncoder.default(self, obj)
 
 
@@ -99,6 +105,8 @@ class AgeInfo:
             self._65_plus = age_data
         self.average = None
         self.stddev = None
+        self.first_quart = None
+        self.third_quart = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -117,7 +125,12 @@ class AgeInfo:
         randomized_ages.extend([random.randint(75, 85) for _ in range(self._75_to_84)])
         randomized_ages.extend([random.randint(85, 95) for _ in range(self._85_plus)])
         self.average = sum(randomized_ages) / len(randomized_ages)
-        self.stddev = statistics.stdev(randomized_ages)
+        self.stddev = statistics.stdev(randomized_ages, xbar=self.average)
+        randomized_ages = sorted(randomized_ages)
+        l = len(randomized_ages)
+        self.first_quart = randomized_ages[int(l / 4)]
+        self.third_quart = randomized_ages[int(3 * l / 4)]
+
 
     def show_stuff(self):
         print(self.total)
@@ -159,6 +172,8 @@ class IncomeInfo:
         self.name = name
         self.average = None
         self.stddev = None
+        self.first_quart = None
+        self.third_quart = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -175,6 +190,10 @@ class IncomeInfo:
         incomes.extend([random.randint(200000, 300000) for _ in range(self.over_200)])
         self.average = statistics.mean(incomes)
         self.stddev = statistics.stdev(incomes)
+        incomes = sorted(incomes)
+        l = len(incomes)
+        self.first_quart = incomes[int(l / 4)]
+        self.third_quart = incomes[int(3 * l / 4)]
 
 
 def get_all_csv_file_names():
@@ -247,7 +266,7 @@ def get_state_abbreviation_from_filename(filename):
     key = ' '.join(before_all.split('_')).upper()
     return STATE_LOOKUP[key]
 
-
+@timed
 def create_dictionaries():
     every_csv = get_all_csv_file_names()
     state_district_ages = {}
