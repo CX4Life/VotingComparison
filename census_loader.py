@@ -4,6 +4,7 @@ import time
 import json
 import random
 import statistics
+import threading
 from functools import wraps
 from get_votes import printProgressBar
 
@@ -68,10 +69,14 @@ STATE_LOOKUP = {
 
 class Encoder (json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, AgeInfo):
-            return {'age': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
-        elif isinstance(obj, IncomeInfo):
-            return {'income': {'name': obj.name, 'average': obj.average, 'stddev': obj.stddev}}
+        if isinstance(obj, AgeInfo) or isinstance(obj, IncomeInfo):
+            return {'name': obj.name,
+                    'average': obj.average,
+                    'stddev': obj.stddev,
+                    'first_quart': obj.first_quart,
+                    'third_quart': obj.third_quart
+                    }
+
         return json.JSONEncoder.default(self, obj)
 
 
@@ -99,6 +104,8 @@ class AgeInfo:
             self._65_plus = age_data
         self.average = None
         self.stddev = None
+        self.first_quart = None
+        self.third_quart = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -117,7 +124,12 @@ class AgeInfo:
         randomized_ages.extend([random.randint(75, 85) for _ in range(self._75_to_84)])
         randomized_ages.extend([random.randint(85, 95) for _ in range(self._85_plus)])
         self.average = sum(randomized_ages) / len(randomized_ages)
-        self.stddev = statistics.stdev(randomized_ages)
+        self.stddev = statistics.stdev(randomized_ages, xbar=self.average)
+        randomized_ages = sorted(randomized_ages)
+        l = len(randomized_ages)
+        self.first_quart = randomized_ages[int(l / 4)]
+        self.third_quart = randomized_ages[int(3 * l / 4)]
+
 
     def show_stuff(self):
         print(self.total)
@@ -159,6 +171,8 @@ class IncomeInfo:
         self.name = name
         self.average = None
         self.stddev = None
+        self.first_quart = None
+        self.third_quart = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -175,6 +189,10 @@ class IncomeInfo:
         incomes.extend([random.randint(200000, 300000) for _ in range(self.over_200)])
         self.average = statistics.mean(incomes)
         self.stddev = statistics.stdev(incomes)
+        incomes = sorted(incomes)
+        l = len(incomes)
+        self.first_quart = incomes[int(l / 4)]
+        self.third_quart = incomes[int(3 * l / 4)]
 
 
 def get_all_csv_file_names():
@@ -187,7 +205,7 @@ def timed(f):
         start = time.time()
         ret = f(*args, **kwargs)
         end = time.time()
-        print(end - start)
+        print('that took', end - start, 'seconds')
         return ret
     return decorated_function
 
@@ -248,60 +266,45 @@ def get_state_abbreviation_from_filename(filename):
     return STATE_LOOKUP[key]
 
 
+def update_dicts_by_thread(combined_dict, state, num, age, income, name):
+    combined_dict[state][num] = {}
+    combined_dict[state][num]['age'] = AgeInfo(age, name)
+    combined_dict[state][num]['income'] = IncomeInfo(income, num)
+
+
+@timed
 def create_dictionaries():
     every_csv = get_all_csv_file_names()
-    state_district_ages = {}
-    state_district_incomes = {}
+    state_district = {}
+    thread_pool = []
 
     for count, csv_filename in enumerate(every_csv):
         printProgressBar(count, len(every_csv) - 1, 'Processing census data')
 
         state_name = get_state_abbreviation_from_filename(csv_filename)
-        state_district_ages[state_name] = {}
-        state_district_incomes[state_name] = {}
+        state_district[state_name] = {}
         with open(PATH_TO_CSVS + csv_filename, 'r') as opened_csv:
             state_age_data, state_income_data = get_distributions_from_csv(opened_csv)
             for i, (age, income) in enumerate(zip(state_age_data, state_income_data)):
                 num_string = str(i + 1).zfill(2)
                 district_name = state_name + num_string
-                age_object = AgeInfo(age, district_name)
-                income_object = IncomeInfo(income, district_name)
-                state_district_ages[state_name][num_string] = age_object
-                state_district_incomes[state_name][num_string] = income_object
+                t = threading.Thread(target=update_dicts_by_thread,
+                                     args=(state_district,
+                                           state_name,
+                                           num_string,
+                                           age,
+                                           income,
+                                           district_name,)
+                                     )
+                thread_pool.append(t)
+                t.start()
 
-    return state_district_ages, state_district_incomes
+    for thread in thread_pool:
+        thread.join()
 
+    print('num threads running', threading.active_count())
 
-def most_over_200k(income_dict):
-    max_over_200 = -1
-    s = ''
-    d = 0
-
-    for state in income_dict.keys():
-        for district in income_dict[state].keys():
-            rich_people_here = income_dict[state][district].over_200
-            if rich_people_here > max_over_200:
-                s = state
-                d = district
-                max_over_200 = rich_people_here
-
-    print('Most over 200k', s, d, max_over_200)
-
-
-def most_under_10k(income_dict):
-    max_under_10 = -1
-    s = ''
-    d = 0
-
-    for state in income_dict.keys():
-        for district in income_dict[state].keys():
-            poor_people_here = income_dict[state][district].under_10
-            if poor_people_here > max_under_10:
-                s = state
-                d = district
-                max_under_10 = poor_people_here
-
-    print('Most under 10k', s, d, max_under_10)
+    return state_district
 
 
 def pretty_dump_to_json_file(obj, openfile):
@@ -309,12 +312,9 @@ def pretty_dump_to_json_file(obj, openfile):
 
 
 def main():
-    age_dict, income_dict = create_dictionaries()
-    with open("age_data.json", "w") as age_output:
-        pretty_dump_to_json_file(age_dict, age_output)
-    with open("income_data.json", "w") as income_output:
-        pretty_dump_to_json_file(income_dict, income_output)
-    # income_dict = create_income_dictionary()
+    combined_dict = create_dictionaries()
+    with open("combined_data.json", "w") as output:
+        pretty_dump_to_json_file(combined_dict, output)
 
 
 if __name__ == '__main__':
