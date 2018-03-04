@@ -19,7 +19,9 @@ def json_dump(filepath, data):
         json.dump(data, current, indent=4)
 
 
-PATH_TO_BILLS = os.path.expanduser('~') + '/PycharmProjects' + '/congress/data'
+USER_HOME_DIR = os.path.expanduser('~')
+VOTING_COMPARISON_DIR = USER_HOME_DIR + '/PycharmProjects/VotingComparison'
+PATH_TO_BILLS = USER_HOME_DIR + '/PycharmProjects' + '/congress/data'
 
 '''
   "bill": {
@@ -36,11 +38,14 @@ def get_bill(congress, num, bill_type):
         file = PATH_TO_BILLS + '/' + congress + '/bills/' + bill_type + '/' + bill_type + num + "/data.json"
         with open(file, 'r') as bill:
             bill = json.load(bill)
-            bill_text = str(bill["summary"]["text"])
-            re.sub('/\\n/', '\n', bill_text)
-            # bill["summary"]["text"] = bill_text
-            print(bill_text)
-            return bill_text
+            if('summary' in bill
+                    and bill['summary'] is not None
+                    and 'text' in bill['summary']):
+                bill_text = str(bill['summary']['text'])
+                re.sub('/\\n/', '\n', bill_text)
+                # bill["summary"]["text"] = bill_text
+                #print(bill_text)
+                return bill_text
     except FileNotFoundError:
         print("Could not find file %s" % file)
 
@@ -81,10 +86,12 @@ def build_bill_json():
                             if(congress is not None and number is not None and bill_type is not None):
                                 bill_summary = get_bill(congress, number, bill_type)
                                 if bill_summary is not None:
-                                    bill_id = bill_type + num + '-' + congress
-                                    #print(bill_id + '\n' + summary)
+                                    bill_id = bill_type + number + '-' + congress
+                                    d[bill_id] = bill_summary
                             else:
                                 raise ValueError("No data for get_bill")
+
+    json_dump(VOTING_COMPARISON_DIR + "/bill_summaries.json", d)
 
 
 
