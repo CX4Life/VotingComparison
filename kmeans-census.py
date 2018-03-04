@@ -3,7 +3,8 @@ import argparse
 from matplotlib import pyplot as plt
 import matplotlib
 import json
-from sklearn.cluster import KMeans
+import hdbscan
+from sklearn.cluster import KMeans, DBSCAN
 
 __author__ = 'Tim Woods'
 __license__ = 'MIT'
@@ -11,9 +12,6 @@ __copyright__ = 'Copyright (c) 2018, Tim Woods'
 
 
 JSON_FILENAME = 'combined_data.json'
-ALGO_LOOKUP = {
-    'kmeans': KMeans
-}
 
 A = 'age'
 I = 'income'
@@ -34,14 +32,13 @@ def get_args():
                         help="Number of clusters to use for KMeans")
     parser.add_argument('-a',
                         type=str,
-                        choices=['kmeans'],
-                        default='kmeans',
-                        help='Which clustering algorithm to use (choices: KMeans)')
+                        choices=['kmeans', 'dbscan', 'RSL', 'hdbscan'],
+                        default='hdbscan',
+                        help='Which clustering algorithm to use (choices: kmeans, dbscan, RSL, hdbscan)')
     return parser.parse_args()
 
 
 def load_census_data():
-    census_data = None
     with open(JSON_FILENAME, 'r') as opened_json:
         census_data = json.load(opened_json)
 
@@ -53,9 +50,12 @@ def array_from_district(single_district):
         single_district[A][FQ],
         single_district[A][MD],
         single_district[A][TQ],
-        single_district[I][FQ],
-        single_district[I][MD],
-        single_district[I][TQ]
+        single_district[I][FQ] / 1000.0,
+        single_district[I][MD] / 1000.0,
+        single_district[I][TQ] / 1000.0,
+        single_district[I][SD] / 1000.0,
+        single_district[A][SD]
+
     ]
 
 
@@ -69,8 +69,16 @@ def create_matrix(census_data):
 
 
 def cluster_np_array(args, array):
-    cluster = ALGO_LOOKUP[args.a](n_clusters=args.c, random_state=0).fit(array)
-    return cluster.labels_
+    if args.a == 'kmeans':
+        return KMeans(n_clusters=args.c, random_state=0).fit(array).labels_
+    elif args.a == 'dbscan':
+        return DBSCAN().fit(array).labels_
+    elif args.a == 'RSL':
+        return hdbscan.RobustSingleLinkage().fit_predict(array)
+    elif args.a == 'hdbscan':
+        return hdbscan.HDBSCAN(min_cluster_size=10).fit_predict(array)
+
+    return None
 
 
 def plot_with_labels(np_array, labels):

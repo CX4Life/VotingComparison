@@ -10,9 +10,9 @@ __license__ = 'MIT'
 
 import os
 import json
-import insert_all_reps
+# import insert_all_reps
 
-USERS_HOME_DIR = os.environ['HOME']
+USERS_HOME_DIR = 'placeholder'#os.environ['HOME']
 CONGRESS_WORKING_DIR = USERS_HOME_DIR + '/CS477/congress'
 PARAM_FILENAME = 'sess_years.json'
 REWRITE_ERRORS = True
