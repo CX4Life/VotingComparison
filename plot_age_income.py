@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import matplotlib
+from mpl_toolkits.mplot3d import Axes3D
 import json
 
 SAMPLE_DATA = 'sample_plot.json'
@@ -36,6 +37,28 @@ def scatterplot(x_data, y_data, x_label, y_label, title):
     plt.show()
 
 
+def scattter_3d(x_data, y_data, z_data, zdir, title, x_label, y_label):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.scatter(x_data, y_data, z_data, zdir)
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.view_init(azim=-20)
+
+    plt.show()
+
+
+def surf_3d():
+    foo = [(1, 2, 3), (5, 4, 6), (3, 2, 1)]
+    sets = [set(x) for x in foo]
+    dupes = dict()
+    for s in sets:
+        dupes[s] += 1
+    indices = [sets.index(item) for item in sets if dupes[item] > 1]
+    return [x for i, x in enumerate(foo) if i not in indices]
+
+
 def main():
     """Plot sample JSON data for age and income of districts"""
     x, y = x_y_from_json(REAL_DATA)
@@ -44,7 +67,12 @@ def main():
     matplotlib.rc('axes.spines', top=False, right=False)
     matplotlib.rc('axes', grid=False)
     matplotlib.rc('axes', facecolor='white')
-    scatterplot(x, y, 'Average Age', 'Average Income', 'Age v Income for Districts')
+    labels = ('Average Age', 'Average Income', 'Age v Income for Districts')
+
+    dumb_z = [(a*b) / 2 for a, b in zip(x, y)]
+
+    # scatterplot(x, y, *labels)
+    scattter_3d(x, y, dumb_z, 'z', *labels)
 
 
 if __name__ == '__main__':
