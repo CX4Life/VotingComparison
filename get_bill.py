@@ -32,18 +32,17 @@ PATH_TO_BILLS = os.path.expanduser('~') + '/PycharmProjects' + '/congress/data'
 
 def get_bill(congress, num, bill_type):
     bill_text = None
-    if(congress is not None and num is not None and bill_type is not None):
-        try:
-            file = PATH_TO_BILLS + '/' + congress + '/bills/' + bill_type + '/' + bill_type + num + "/data.json"
-            with open(file, 'r') as bill:
-                bill = json.load(bill)
-                bill_text = str(bill["summary"]["text"])
-                re.sub('/\\n/', '\n', bill_text)
-                # bill["summary"]["text"] = bill_text
-                # print(bill["summary"]["text"])
-                return bill_text
-        except FileNotFoundError:
-            print("Could not find file %s" % file)
+    try:
+        file = PATH_TO_BILLS + '/' + congress + '/bills/' + bill_type + '/' + bill_type + num + "/data.json"
+        with open(file, 'r') as bill:
+            bill = json.load(bill)
+            bill_text = str(bill["summary"]["text"])
+            re.sub('/\\n/', '\n', bill_text)
+            # bill["summary"]["text"] = bill_text
+            print(bill_text)
+            return bill_text
+    except FileNotFoundError:
+        print("Could not find file %s" % file)
 
     return bill_text
 
@@ -60,7 +59,7 @@ def build_bill_json():
 
                 first = True
                 for vote_folder in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes/' + year):
-                    print(vote_folder)
+                    #print(vote_folder)
                     with open(PATH_TO_BILLS
                               + '/'
                               + congress_meeting
@@ -71,22 +70,21 @@ def build_bill_json():
                               + '/data.json', 'r') as vote_file:
                         vote_data = json.load(vote_file)
                         if('bill' in vote_data):
-                            if('congress' in vote_data['bill']
-                                    and 'number' in vote_data['bill']
-                                    and 'bill_type' in vote_data['bill']):
-                                congress = vote_data["bill"]["congress"]
-                                number = vote_data["bill"]["number"]
-                                bill_type = vote_data["bill"]["type"]
+                            #print(vote_data)
+                            #if('congress' in vote_data['bill']
+                            #        and 'number' in vote_data['bill']
+                            #        and 'bill_type' in vote_data['bill']):
+                            congress = str(vote_data['bill']['congress'])
+                            number = str(vote_data['bill']['number'])
+                            bill_type = vote_data['bill']['type']
 
+                            if(congress is not None and number is not None and bill_type is not None):
                                 bill_summary = get_bill(congress, number, bill_type)
                                 if bill_summary is not None:
                                     bill_id = bill_type + num + '-' + congress
-
-                                    if first:
-                                        print(bill_id + "\n" + summary)
-                                        first = False
-
-                            # d[bill_id] = bill_summary
+                                    #print(bill_id + '\n' + summary)
+                            else:
+                                raise ValueError("No data for get_bill")
 
 
 
