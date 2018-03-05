@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 USER_HOME_DIR = os.path.expanduser('~')
 VOTING_COMPARISON_DIR = USER_HOME_DIR + '/PycharmProjects/VotingComparison'
@@ -49,37 +50,33 @@ def rep_votes():
                                 and number is not None
                                 and bill_type is not None):
                             bill_id = bill_type + number + '-' + congress
-                            #passage = vote_data['category']
-                            #result = vote_data['result']
                             if bill_id in bill_summaries:
-                                #if vote_data['category'] is 'passage':
+                                if vote_data['category'] == 'passage' and vote_data['chamber'] == 'h':
+                                    if not re.search("(?:^|\W)Senate|Conference Report(?:$|\W)", vote_data['type']):
+                                        entities = get_entities(bill_id)
+                                        if entities is not None:
+                                            if 'votes' in vote_data:
+                                                if 'Nay' in vote_data['votes']:
+                                                    for Nay in vote_data['votes']['Nay']:
+                                                        rep_sentiment = process_vote(rep_sentiment, Nay['id'], False, entities)
 
-                                entities = get_entities(bill_id)
-                                if entities is not None:
-                                    if 'votes' in vote_data:
-                                        if 'Nay' in vote_data['votes']:
-                                            for Nay in vote_data['votes']['Nay']:
-                                                rep_sentiment = process_vote(rep_sentiment, Nay['id'], False, entities)
+                                                if 'No' in vote_data['votes']:
+                                                    for No in vote_data['votes']['No']:
+                                                        rep_sentiment = process_vote(rep_sentiment, No['id'], False, entities)
 
-                                        if 'No' in vote_data['votes']:
-                                            for No in vote_data['votes']['No']:
-                                                rep_sentiment = process_vote(rep_sentiment, No['id'], False, entities)
+                                                if 'Aye' in vote_data['votes']:
+                                                    for Aye in vote_data['votes']['Aye']:
+                                                        rep_sentiment = process_vote(rep_sentiment, Aye['id'], True, entities)
 
-                                        if 'Aye' in vote_data['votes']:
-                                            for Aye in vote_data['votes']['Aye']:
-                                                rep_sentiment = process_vote(rep_sentiment, Aye['id'], True, entities)
+                                                if 'Yes' in vote_data['votes']:
+                                                    for Yes in vote_data['votes']['Yes']:
+                                                        rep_sentiment = process_vote(rep_sentiment, Yes['id'], True, entities)
 
-                                        if 'Yes' in vote_data['votes']:
-                                            for Yes in vote_data['votes']['Yes']:
-                                                rep_sentiment = process_vote(rep_sentiment, Yes['id'], True, entities)
-
-                                        if ('Nay' not in vote_data['votes']
-                                                and 'No' not in vote_data['votes']
-                                                and 'Aye' not in vote_data['votes']
-                                                and 'Yes' not in vote_data['votes']):
-                                            print("ERROR: no votes in %s" % bill_id)
-                                else:
-                                    print("ERROR: could not find entites for bill %s" % bill_id)
+                                                if ('Nay' not in vote_data['votes']
+                                                        and 'No' not in vote_data['votes']
+                                                        and 'Aye' not in vote_data['votes']
+                                                        and 'Yes' not in vote_data['votes']):
+                                                    print("ERROR: no votes in %s" % bill_id)
 
                         else:
                             raise ValueError("No data for get_bill")
@@ -113,6 +110,8 @@ def process_vote(rep_sentiment, repID, add, entities):
 def check_duplicates():
     bills = {}
 
+    printout = {}
+
     bill_summaries = json_loader('bill_summaries.json')
 
     for congress_meeting in os.listdir(PATH_TO_VOTES):
@@ -138,21 +137,28 @@ def check_duplicates():
                                 and number is not None
                                 and bill_type is not None):
                             bill_id = bill_type + number + '-' + congress
-                            # passage = vote_data['category']
-                            # result = vote_data['result']
                             if bill_id in bill_summaries:
-                                # if vote_data['category'] is 'passage':
-                                if bill_id not in bills:
-                                    bills[bill_id] = 0
-                                else:
-                                    bills[bill_id] += 1
+                                if vote_data['category'] == 'passage' and vote_data['chamber'] == 'h':
+                                    if not re.search("(?:^|\W)Senate|Conference Report(?:$|\W)", vote_data['type']):
+                                        if bill_id not in printout:
+                                            printout[bill_id] = {'vote_id': [{'id':vote_data['vote_id'], 'type':vote_data['type']}], 'i': 1}
+                                        else:
+                                            printout[bill_id]['i'] += 1
+                                            printout[bill_id]['vote_id'].append({'id':vote_data['vote_id'], 'type':vote_data['type']})
+
 
                         else:
                             raise ValueError("No data for get_entities")
 
-    for key, value in bills.items():
-        if value > 1:
-            print(key + ": " + str(value))
+
+
+    for key, value in sorted(printout.items()):
+        #for ID in value['vote_id']:
+            #if re.search("(?:^|\W)Conference(?:$|\W)", ID['type']):
+        if value['i'] > 1:
+            print(key + str(value))
+    print('\n\n')
+    print("bills length = %s" % len(printout))
 
 
 def main():
@@ -160,8 +166,10 @@ def main():
     #entity = {'apples':sentiment_stuff}
     #sentiments = {'hr244-115':entity}
     #json_dump(VOTING_COMPARISON_DIR + "/sentiments.json", sentiments)
-    #rep_votes()
-    check_duplicates()
+    rep_votes()
+    #check_duplicates()
+    #bill_summaries = json_loader('bill_summaries.json')
+    #print(len(bill_summaries))
 
 
 if __name__ == '__main__':
