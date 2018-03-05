@@ -93,14 +93,42 @@ def trim(filepath):
 
     json_dump("dumpfile.json", data)
 
+class RepTerm:
+
+    def __init__(self, start_date, end_date, district, state):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.district = district
+        self.state = state
+
+
+def get_district(rep_id, date):
+    historic = 'rep_info/legislators-historical.json'
+    current = 'rep_info/legislators-current.json'
+
+
+
+    data = json_loader(current)
+
+    termlist = [2][]
+    for x in data:
+        for term in x['terms']:
+            if term['type'] == 'rep':
+                # date = datetime.strptime(term['start'], "%Y-%m-%d")
+                if term['start'] > date(2012, 12, 25).isoformat():
+                    return term.get('district')
+
+    return termlist
+
 def main():
     #sample = 'rep_info/legislators-sample.json'
     historic = 'rep_info/legislators-historical.json'
     current = 'rep_info/legislators-current.json'
 
     #print_changed_districts(current)
-    trim(current)
+    #trim(current)
 
+    print(get_district("B000944"))
 
 
 if __name__ == "__main__":

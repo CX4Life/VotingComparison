@@ -1,7 +1,6 @@
 import json
 import re
 import os
-from datetime import date, datetime
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -19,7 +18,9 @@ def json_dump(filepath, data):
         json.dump(data, current, indent=4)
 
 
-PATH_TO_BILLS = os.path.expanduser('~') + '/PycharmProjects' + '/congress/data'
+USER_HOME_DIR = os.path.expanduser('~')
+VOTING_COMPARISON_DIR = USER_HOME_DIR + '/PycharmProjects/VotingComparison'
+PATH_TO_BILLS = USER_HOME_DIR + '/PycharmProjects' + '/congress/data'
 
 '''
   "bill": {
@@ -32,18 +33,20 @@ PATH_TO_BILLS = os.path.expanduser('~') + '/PycharmProjects' + '/congress/data'
 
 def get_bill(congress, num, bill_type):
     bill_text = None
-    if(congress is not None and num is not None and bill_type is not None):
-        try:
-            file = PATH_TO_BILLS + '/' + congress + '/bills/' + bill_type + '/' + bill_type + num + "/data.json"
-            with open(file, 'r') as bill:
-                bill = json.load(bill)
-                bill_text = str(bill["summary"]["text"])
+    try:
+        file = PATH_TO_BILLS + '/' + congress + '/bills/' + bill_type + '/' + bill_type + num + "/data.json"
+        with open(file, 'r') as bill:
+            bill = json.load(bill)
+            if('summary' in bill
+                    and bill['summary'] is not None
+                    and 'text' in bill['summary']):
+                bill_text = str(bill['summary']['text'])
                 re.sub('/\\n/', '\n', bill_text)
                 # bill["summary"]["text"] = bill_text
-                # print(bill["summary"]["text"])
+                #print(bill_text)
                 return bill_text
-        except FileNotFoundError:
-            print("Could not find file %s" % file)
+    except FileNotFoundError:
+        print("Could not find file %s" % file)
 
     return bill_text
 
@@ -51,42 +54,41 @@ def get_bill(congress, num, bill_type):
 def build_bill_json():
     d = {}
 
+    senate_ty = ['s', 'sconres', 'sjres', 'sres']
+
     for congress_meeting in os.listdir(PATH_TO_BILLS):
-        #print(congress_meeting)
-        for year in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes'):
-            if year > "113":
+        if congress_meeting >= "113":
+            #print(congress_meeting)
+            for year in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes'):
                 #print(year)
                 # for years in os.walk(congress):
 
                 first = True
                 for vote_folder in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes/' + year):
-                    print(vote_folder)
-                    with open(PATH_TO_BILLS
+                    #print(vote_folder)
+                    vote_data = json_loader(PATH_TO_BILLS
                               + '/'
                               + congress_meeting
                               + '/votes/'
                               + year
                               + '/'
                               + vote_folder
-                              + '/data.json', 'r') as vote_file:
-                        vote_data = json.load(vote_file)
-                        if('bill' in vote_data):
-                            if('congress' in vote_data['bill']
-                                    and 'number' in vote_data['bill']
-                                    and 'bill_type' in vote_data['bill']):
-                                congress = vote_data["bill"]["congress"]
-                                number = vote_data["bill"]["number"]
-                                bill_type = vote_data["bill"]["type"]
+                              + '/data.json')
+                    if 'bill' in vote_data:
+                        congress = str(vote_data['bill']['congress'])
+                        number = str(vote_data['bill']['number'])
+                        bill_type = vote_data['bill']['type']
 
+                        if congress is not None and number is not None and bill_type is not None:
+                            if bill_type not in senate_ty:
                                 bill_summary = get_bill(congress, number, bill_type)
                                 if bill_summary is not None:
-                                    bill_id = bill_type + num + '-' + congress
+                                    bill_id = bill_type + number + '-' + congress
+                                    d[bill_id] = bill_summary
+                        else:
+                            raise ValueError("No data for get_bill")
 
-                                    if first:
-                                        print(bill_id + "\n" + summary)
-                                        first = False
-
-                            # d[bill_id] = bill_summary
+    json_dump(VOTING_COMPARISON_DIR + "/bill_summaries.json", d)
 
 
 
