@@ -15,10 +15,12 @@ JSON_FILENAME = 'combined_data.json'
 
 A = 'age'
 I = 'income'
-FQ = 'first_quart'
+T1 = 'first_sixth'
+T2 = 'second_sixth'
+T4 = 'fourth_sixth'
+T5 = 'fifth_sixth'
 MD = 'median'
 AV = 'average'
-TQ = 'third_quart'
 SD = 'stddev'
 
 
@@ -47,15 +49,18 @@ def load_census_data():
 
 def array_from_district(single_district):
     return [
-        single_district[A][FQ],
+        single_district[A][T1],
+        single_district[A][T2],
         single_district[A][MD],
-        single_district[A][TQ],
-        single_district[I][FQ] / 1000.0,
+        single_district[A][T4],
+        single_district[A][T5],
+        single_district[I][T1] / 1000.0,
+        single_district[I][T2] / 1000.0,
         single_district[I][MD] / 1000.0,
-        single_district[I][TQ] / 1000.0,
-        single_district[I][SD] / 1000.0,
-        single_district[A][SD]
-
+        single_district[I][T4] / 1000.0,
+        single_district[I][T5] / 1000.0,
+        single_district[A][SD],
+        single_district[I][SD],
     ]
 
 
