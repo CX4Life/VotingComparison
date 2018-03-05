@@ -42,8 +42,6 @@ def get_bill(congress, num, bill_type):
                     and 'text' in bill['summary']):
                 bill_text = str(bill['summary']['text'])
                 re.sub('/\\n/', '\n', bill_text)
-                # bill["summary"]["text"] = bill_text
-                #print(bill_text)
                 return bill_text
     except FileNotFoundError:
         print("Could not find file %s" % file)
@@ -58,22 +56,16 @@ def build_bill_json():
 
     for congress_meeting in os.listdir(PATH_TO_BILLS):
         if congress_meeting >= "113":
-            #print(congress_meeting)
             for year in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes'):
-                #print(year)
-                # for years in os.walk(congress):
-
-                first = True
                 for vote_folder in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes/' + year):
-                    #print(vote_folder)
                     vote_data = json_loader(PATH_TO_BILLS
-                              + '/'
-                              + congress_meeting
-                              + '/votes/'
-                              + year
-                              + '/'
-                              + vote_folder
-                              + '/data.json')
+                                            + '/'
+                                            + congress_meeting
+                                            + '/votes/'
+                                            + year
+                                            + '/'
+                                            + vote_folder
+                                            + '/data.json')
                     if 'bill' in vote_data:
                         congress = str(vote_data['bill']['congress'])
                         number = str(vote_data['bill']['number'])
