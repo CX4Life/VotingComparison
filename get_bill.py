@@ -1,7 +1,6 @@
 import json
 import re
 import os
-from datetime import date, datetime
 
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
@@ -56,9 +55,9 @@ def build_bill_json():
     d = {}
 
     for congress_meeting in os.listdir(PATH_TO_BILLS):
-        #print(congress_meeting)
-        for year in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes'):
-            if year > "113":
+        if congress_meeting >= "113":
+            #print(congress_meeting)
+            for year in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes'):
                 #print(year)
                 # for years in os.walk(congress):
 
@@ -74,7 +73,7 @@ def build_bill_json():
                               + vote_folder
                               + '/data.json', 'r') as vote_file:
                         vote_data = json.load(vote_file)
-                        if('bill' in vote_data):
+                        if 'bill' in vote_data:
                             #print(vote_data)
                             #if('congress' in vote_data['bill']
                             #        and 'number' in vote_data['bill']
@@ -83,7 +82,7 @@ def build_bill_json():
                             number = str(vote_data['bill']['number'])
                             bill_type = vote_data['bill']['type']
 
-                            if(congress is not None and number is not None and bill_type is not None):
+                            if congress is not None and number is not None and bill_type is not None:
                                 bill_summary = get_bill(congress, number, bill_type)
                                 if bill_summary is not None:
                                     bill_id = bill_type + number + '-' + congress
