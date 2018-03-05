@@ -54,6 +54,8 @@ def get_bill(congress, num, bill_type):
 def build_bill_json():
     d = {}
 
+    senate_ty = ['s', 'sconres', 'sjres', 'sres']
+
     for congress_meeting in os.listdir(PATH_TO_BILLS):
         if congress_meeting >= "113":
             #print(congress_meeting)
@@ -64,29 +66,25 @@ def build_bill_json():
                 first = True
                 for vote_folder in os.listdir(PATH_TO_BILLS + '/' + congress_meeting + '/votes/' + year):
                     #print(vote_folder)
-                    with open(PATH_TO_BILLS
+                    vote_data = json_loader(PATH_TO_BILLS
                               + '/'
                               + congress_meeting
                               + '/votes/'
                               + year
                               + '/'
                               + vote_folder
-                              + '/data.json', 'r') as vote_file:
-                        vote_data = json.load(vote_file)
+                              + '/data.json')
                         if 'bill' in vote_data:
-                            #print(vote_data)
-                            #if('congress' in vote_data['bill']
-                            #        and 'number' in vote_data['bill']
-                            #        and 'bill_type' in vote_data['bill']):
                             congress = str(vote_data['bill']['congress'])
                             number = str(vote_data['bill']['number'])
                             bill_type = vote_data['bill']['type']
 
                             if congress is not None and number is not None and bill_type is not None:
-                                bill_summary = get_bill(congress, number, bill_type)
-                                if bill_summary is not None:
-                                    bill_id = bill_type + number + '-' + congress
-                                    d[bill_id] = bill_summary
+                                if bill_type not in senate_ty:
+                                    bill_summary = get_bill(congress, number, bill_type)
+                                    if bill_summary is not None:
+                                        bill_id = bill_type + number + '-' + congress
+                                        d[bill_id] = bill_summary
                             else:
                                 raise ValueError("No data for get_bill")
 
