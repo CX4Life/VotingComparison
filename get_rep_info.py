@@ -1,5 +1,3 @@
-# https://github.com/unitedstates/congress-legislators
-
 '''
 TERMS
 repid
@@ -9,25 +7,9 @@ end
 state
 district (null if sen)
 '''
-
-from yaml import load, dump
 import json
 from datetime import date, datetime
-
-try:
-    from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
-    from yaml import Loader, Dumper
-
-
-def json_loader(filepath):
-    with open(filepath, 'r') as current:
-        return json.load(current)
-
-
-def json_dump(filepath, data):
-    with open(filepath, 'w') as current:
-        json.dump(data, current, indent=4)
+from get_bill import json_loader, json_dump
 
 def print_districts(filepath):
     data = json_loader(filepath)
@@ -93,6 +75,7 @@ def trim(filepath):
 
     json_dump("dumpfile.json", data)
 
+'''
 class RepTerm:
 
     def __init__(self, start_date, end_date, district, state):
@@ -119,6 +102,22 @@ def get_district(rep_id, date):
                     return term.get('district')
 
     return termlist
+'''
+
+'''
+repID:
+    {
+        Entity:
+            {
+                'salience' = 0
+                'score' = 0
+                'magnitude' = 0
+            }
+    }
+'''
+
+
+
 
 def main():
     #sample = 'rep_info/legislators-sample.json'
@@ -128,7 +127,7 @@ def main():
     #print_changed_districts(current)
     #trim(current)
 
-    print(get_district("B000944"))
+    #print(get_district("B000944"))
 
 
 if __name__ == "__main__":
