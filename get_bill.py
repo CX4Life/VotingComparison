@@ -74,19 +74,19 @@ def build_bill_json():
                               + '/'
                               + vote_folder
                               + '/data.json')
-                        if 'bill' in vote_data:
-                            congress = str(vote_data['bill']['congress'])
-                            number = str(vote_data['bill']['number'])
-                            bill_type = vote_data['bill']['type']
+                    if 'bill' in vote_data:
+                        congress = str(vote_data['bill']['congress'])
+                        number = str(vote_data['bill']['number'])
+                        bill_type = vote_data['bill']['type']
 
-                            if congress is not None and number is not None and bill_type is not None:
-                                if bill_type not in senate_ty:
-                                    bill_summary = get_bill(congress, number, bill_type)
-                                    if bill_summary is not None:
-                                        bill_id = bill_type + number + '-' + congress
-                                        d[bill_id] = bill_summary
-                            else:
-                                raise ValueError("No data for get_bill")
+                        if congress is not None and number is not None and bill_type is not None:
+                            if bill_type not in senate_ty:
+                                bill_summary = get_bill(congress, number, bill_type)
+                                if bill_summary is not None:
+                                    bill_id = bill_type + number + '-' + congress
+                                    d[bill_id] = bill_summary
+                        else:
+                            raise ValueError("No data for get_bill")
 
     json_dump(VOTING_COMPARISON_DIR + "/bill_summaries.json", d)
 
