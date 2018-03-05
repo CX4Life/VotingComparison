@@ -110,12 +110,58 @@ def process_vote(rep_sentiment, repID, add, entities):
     return rep_sentiment
 
 
+def check_duplicates():
+    bills = {}
+
+    bill_summaries = json_loader('bill_summaries.json')
+
+    for congress_meeting in os.listdir(PATH_TO_VOTES):
+        if congress_meeting >= "113":
+            for year in os.listdir(PATH_TO_VOTES + '/' + congress_meeting + '/votes'):
+
+                for vote_folder in os.listdir(PATH_TO_VOTES + '/' + congress_meeting + '/votes/' + year):
+                    vote_data = json_loader(PATH_TO_VOTES
+                                            + '/'
+                                            + congress_meeting
+                                            + '/votes/'
+                                            + year
+                                            + '/'
+                                            + vote_folder
+                                            + '/data.json')
+
+                    if 'bill' in vote_data:
+                        congress = str(vote_data['bill']['congress'])
+                        number = str(vote_data['bill']['number'])
+                        bill_type = vote_data['bill']['type']
+
+                        if (congress is not None
+                                and number is not None
+                                and bill_type is not None):
+                            bill_id = bill_type + number + '-' + congress
+                            # passage = vote_data['category']
+                            # result = vote_data['result']
+                            if bill_id in bill_summaries:
+                                # if vote_data['category'] is 'passage':
+                                if bill_id not in bills:
+                                    bills[bill_id] = 0
+                                else:
+                                    bills[bill_id] += 1
+
+                        else:
+                            raise ValueError("No data for get_entities")
+
+    for key, value in bills.items():
+        if value > 1:
+            print(key + ": " + str(value))
+
+
 def main():
     #sentiment_stuff = {'salience': 1, 'score': 2, 'magnitude': 0.9}
     #entity = {'apples':sentiment_stuff}
     #sentiments = {'hr244-115':entity}
     #json_dump(VOTING_COMPARISON_DIR + "/sentiments.json", sentiments)
-    rep_votes()
+    #rep_votes()
+    check_duplicates()
 
 
 if __name__ == '__main__':
