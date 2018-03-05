@@ -1,4 +1,5 @@
 import os
+import sys
 import csv
 import time
 import json
@@ -74,6 +75,7 @@ class Encoder (json.JSONEncoder):
                     'average': obj.average,
                     'stddev': obj.stddev,
                     'first_quart': obj.first_quart,
+                    'median': obj.median,
                     'third_quart': obj.third_quart
                     }
 
@@ -272,37 +274,24 @@ def update_dicts_by_thread(combined_dict, state, num, age, income, name):
     combined_dict[state][num]['income'] = IncomeInfo(income, num)
 
 
-@timed
 def create_dictionaries():
     every_csv = get_all_csv_file_names()
     state_district = {}
     thread_pool = []
 
     for count, csv_filename in enumerate(every_csv):
-        printProgressBar(count, len(every_csv) - 1, 'Processing census data')
 
         state_name = get_state_abbreviation_from_filename(csv_filename)
         state_district[state_name] = {}
         with open(PATH_TO_CSVS + csv_filename, 'r') as opened_csv:
             state_age_data, state_income_data = get_distributions_from_csv(opened_csv)
             for i, (age, income) in enumerate(zip(state_age_data, state_income_data)):
+                pb_len = max(len(state_age_data) - 1, 1)
+                printProgressBar(i, pb_len, 'Processing ' + state_name)
                 num_string = str(i + 1).zfill(2)
                 district_name = state_name + num_string
-                t = threading.Thread(target=update_dicts_by_thread,
-                                     args=(state_district,
-                                           state_name,
-                                           num_string,
-                                           age,
-                                           income,
-                                           district_name,)
-                                     )
-                thread_pool.append(t)
-                t.start()
-
-    for thread in thread_pool:
-        thread.join()
-
-    print('num threads running', threading.active_count())
+                update_dicts_by_thread(state_district, state_name, num_string, age, income, district_name)
+        print()
 
     return state_district
 

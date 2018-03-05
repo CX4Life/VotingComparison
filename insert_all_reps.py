@@ -30,7 +30,7 @@ def insert_representative_into_table(rep, conn):
     updated = cur.execute(
         "INSERT IGNORE INTO Representative VALUES (%s, %s, %s, %s);",
         (rep['id'], rep['display_name'], rep['party'], rep['state']))
-    with open(LOG_FILE, 'r') as log:
+    with open(LOG_FILE, 'w') as log:
         log.write('{}: Added {}'.format(datetime.now(), rep['id']))
 
 def return_representatives(json_file):
