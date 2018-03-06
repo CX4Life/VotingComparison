@@ -7825,6 +7825,30 @@
       }
     }
   },
+  "SD": {
+    "01": {
+      "age": {
+        "average": 38.71817681817867,
+        "fifth_sixth": 65,
+        "first_sixth": 12,
+        "fourth_sixth": 52,
+        "median": 36.8,
+        "name": "SD01",
+        "second_sixth": 24,
+        "stddev": 24.044631466659546
+      },
+      "income": {
+        "average": 69889.87236277173,
+        "fifth_sixth": 114690,
+        "first_sixth": 21553,
+        "fourth_sixth": 78170,
+        "median": 54467,
+        "name": "SD01",
+        "second_sixth": 39161,
+        "stddev": 55858.775238128525
+      }
+    }
+  },
   "TN": {
     "01": {
       "age": {
