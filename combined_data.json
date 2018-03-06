@@ -7,7 +7,7 @@
         "first_sixth": 12,
         "fourth_sixth": 47,
         "median": 33.5,
-        "name": "AK01",
+        "name": "AK00",
         "second_sixth": 24,
         "stddev": 21.84619415532434
       },
@@ -17,7 +17,7 @@
         "first_sixth": 33637,
         "fourth_sixth": 110133,
         "median": 76440,
-        "name": "AK01",
+        "name": "AK00",
         "second_sixth": 56486,
         "stddev": 65089.37235561881
       }
@@ -1913,7 +1913,7 @@
         "first_sixth": 16,
         "fourth_sixth": 45,
         "median": 33.9,
-        "name": "DC01",
+        "name": "DC00",
         "second_sixth": 26,
         "stddev": 21.31740546759037
       },
@@ -1923,7 +1923,7 @@
         "first_sixth": 13052,
         "fourth_sixth": 118049,
         "median": 75506,
-        "name": "DC01",
+        "name": "DC00",
         "second_sixth": 38079,
         "stddev": 82623.7028623883
       }
@@ -1937,7 +1937,7 @@
         "first_sixth": 14,
         "fourth_sixth": 54,
         "median": 40.6,
-        "name": "DE01",
+        "name": "DE00",
         "second_sixth": 27,
         "stddev": 23.51325595721936
       },
@@ -1947,7 +1947,7 @@
         "first_sixth": 25808,
         "fourth_sixth": 89964,
         "median": 61757,
-        "name": "DE01",
+        "name": "DE00",
         "second_sixth": 43532,
         "stddev": 62097.392027172515
       }
@@ -5185,7 +5185,7 @@
         "first_sixth": 14,
         "fourth_sixth": 55,
         "median": 40.1,
-        "name": "MT01",
+        "name": "MT00",
         "second_sixth": 26,
         "stddev": 23.793497845755883
       },
@@ -5195,7 +5195,7 @@
         "first_sixth": 20209,
         "fourth_sixth": 74341,
         "median": 50027,
-        "name": "MT01",
+        "name": "MT00",
         "second_sixth": 36778,
         "stddev": 56328.070121666366
       }
@@ -5497,7 +5497,7 @@
         "first_sixth": 12,
         "fourth_sixth": 50,
         "median": 35.0,
-        "name": "ND01",
+        "name": "ND00",
         "second_sixth": 25,
         "stddev": 23.520314666508405
       },
@@ -5507,7 +5507,7 @@
         "first_sixth": 24588,
         "fourth_sixth": 88478,
         "median": 60656,
-        "name": "ND01",
+        "name": "ND00",
         "second_sixth": 43265,
         "stddev": 60046.85432140025
       }
@@ -7833,7 +7833,7 @@
         "first_sixth": 12,
         "fourth_sixth": 52,
         "median": 36.8,
-        "name": "SD01",
+        "name": "SD00",
         "second_sixth": 24,
         "stddev": 24.044631466659546
       },
@@ -7843,7 +7843,7 @@
         "first_sixth": 21553,
         "fourth_sixth": 78170,
         "median": 54467,
-        "name": "SD01",
+        "name": "SD00",
         "second_sixth": 39161,
         "stddev": 55858.775238128525
       }
@@ -9677,7 +9677,7 @@
         "first_sixth": 12,
         "fourth_sixth": 51,
         "median": 37.2,
-        "name": "WY01",
+        "name": "WY00",
         "second_sixth": 25,
         "stddev": 23.414238393547453
       },
@@ -9687,7 +9687,7 @@
         "first_sixth": 26104,
         "fourth_sixth": 87528,
         "median": 59882,
-        "name": "WY01",
+        "name": "WY00",
         "second_sixth": 43105,
         "stddev": 57548.2680366048
       }
