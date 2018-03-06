@@ -15,7 +15,7 @@ def json_loader(filepath):
 
 def json_dump(filepath, data):
     with open(filepath, 'w') as current:
-        json.dump(data, current, indent=4)
+        json.dump(data, current, indent=4, sort_keys=True)
 
 
 USER_HOME_DIR = os.path.expanduser('~')
