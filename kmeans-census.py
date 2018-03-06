@@ -67,13 +67,14 @@ def array_from_district(single_district):
     ]
 
 
-def create_matrix(census_data):
+def create_matrix_and_names(census_data):
     ret = []
+    names = []
     for state in census_data.keys():
         for district in census_data[state].keys():
             ret.append(array_from_district(census_data[state][district]))
-
-    return np.array(ret)
+            names.append(census_data[state][district]['age']['name'])
+    return np.array(ret), names
 
 
 def cluster_np_array(args, array):
@@ -89,13 +90,21 @@ def cluster_np_array(args, array):
     return None
 
 
-def plot_with_labels(np_array, labels):
-    def scatterplot(x_data, y_data, color_labels, x_label, y_label, title):
+def plot_with_labels(np_array, labels, districts):
+    def scatterplot(x_data, y_data, color_labels, x_label, y_label, title, districts):
         _, ax = plt.subplots()
         ax.scatter(x_data, y_data, c=color_labels, s=30, alpha=0.8)
         ax.set_title(title)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
+        # for district, x, y in zip(districts, x_data, y_data):
+        #     plt.annotate(
+        #         district,
+        #         xy = (x, y), xytext=(-20, 20),
+        #         textcoords='offset points', ha='right', va='bottom',
+        #         bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
+        #         arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0')
+        #     )
         plt.show()
 
     x = [x[2] for x in np_array]
@@ -105,14 +114,14 @@ def plot_with_labels(np_array, labels):
     matplotlib.rc('axes.spines', top=False, right=False)
     matplotlib.rc('axes', grid=False)
     matplotlib.rc('axes', facecolor='white')
-    scatterplot(x, y, labels, 'Average Age', 'Average Income', 'Age v Income for Districts')
+    scatterplot(x, y, labels, 'Average Age', 'Average Income', 'Age v Income for Districts', districts)
 
 def print_rep_id_from_order_dist(rep_map, dists):
     reps = [rep_map[x] for x in dists]
     print(reps)
 
 
-def labels_from_rep_class_json():
+def labels_from_rep_class_json(ordered_district):
     with open(REP_CLASS_FILENAME, 'r') as class_file:
         # key-val = repID - class
         rep_classes = json.load(class_file)
@@ -122,31 +131,33 @@ def labels_from_rep_class_json():
         lookup = json.load(l)
 
     reverse_lookup = {b: a for a, b in zip(lookup.keys(), lookup.values())}
-    ordered_district = sorted(list(lookup.keys()))
 
-    output_classes = [0 for _ in range(len(lookup.keys()))]
+    output_classes = [-1 for _ in range(len(ordered_district))]
     for rep in rep_classes:
         try:
-            output_classes[ordered_district.index(reverse_lookup[rep])] = rep_classes[rep]
+            reps_district = reverse_lookup[rep]
+            index_of_district = ordered_district.index(reps_district)
+            reps_classification = rep_classes[rep]
+            output_classes[index_of_district] = reps_classification
         except KeyError:
             continue
 
-    print(len(output_classes))
     return output_classes
 
 
 def main():
-    rep_labels = labels_from_rep_class_json()
 
     args = get_args()
     print('loading data')
     district_census_info = load_census_data()
     print('creating numpy array')
-    ready_to_cluster = create_matrix(district_census_info)
+    ready_to_cluster, districts = create_matrix_and_names(district_census_info)
+
     print('clustering...')
     labels = cluster_np_array(args, ready_to_cluster)
-    plot_with_labels(ready_to_cluster, labels)
-    plot_with_labels(ready_to_cluster, np.array(rep_labels))
+    plot_with_labels(ready_to_cluster, labels, districts)
+    rep_labels = labels_from_rep_class_json(districts)
+    plot_with_labels(ready_to_cluster, np.array(rep_labels), districts)
 
 
 if __name__ == '__main__':
