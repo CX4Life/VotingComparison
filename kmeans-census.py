@@ -3,6 +3,7 @@ import argparse
 from matplotlib import pyplot as plt
 import matplotlib
 import json
+import sys
 import hdbscan
 from sklearn.cluster import KMeans, DBSCAN
 
@@ -106,6 +107,10 @@ def plot_with_labels(np_array, labels):
     matplotlib.rc('axes', facecolor='white')
     scatterplot(x, y, labels, 'Average Age', 'Average Income', 'Age v Income for Districts')
 
+def print_rep_id_from_order_dist(rep_map, dists):
+    reps = [rep_map[x] for x in dists]
+    print(reps)
+
 
 def labels_from_rep_class_json():
     with open(REP_CLASS_FILENAME, 'r') as class_file:
@@ -116,17 +121,23 @@ def labels_from_rep_class_json():
         # key-val = district-repID
         lookup = json.load(l)
 
-    reverse_lookup = [b[a] for a, b in zip(lookup.keys(), lookup.values())]
+    reverse_lookup = {b: a for a, b in zip(lookup.keys(), lookup.values())}
     ordered_district = sorted(list(lookup.keys()))
 
-    output_classes = [0 for _ in range(len(rep_classes.keys()))]
+    output_classes = [0 for _ in range(len(lookup.keys()))]
     for rep in rep_classes:
-        output_classes[ordered_district.index(reverse_lookup[rep])] = rep_classes[rep]
+        try:
+            output_classes[ordered_district.index(reverse_lookup[rep])] = rep_classes[rep]
+        except KeyError:
+            continue
 
+    print(len(output_classes))
     return output_classes
 
 
 def main():
+    rep_labels = labels_from_rep_class_json()
+
     args = get_args()
     print('loading data')
     district_census_info = load_census_data()
@@ -135,6 +146,7 @@ def main():
     print('clustering...')
     labels = cluster_np_array(args, ready_to_cluster)
     plot_with_labels(ready_to_cluster, labels)
+    plot_with_labels(ready_to_cluster, np.array(rep_labels))
 
 
 if __name__ == '__main__':
