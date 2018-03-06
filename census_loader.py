@@ -74,9 +74,11 @@ class Encoder (json.JSONEncoder):
             return {'name': obj.name,
                     'average': obj.average,
                     'stddev': obj.stddev,
-                    'first_quart': obj.first_quart,
+                    'first_sixth': obj.first_sixth,
+                    'second_sixth': obj.second_sixth,
                     'median': obj.median,
-                    'third_quart': obj.third_quart
+                    'fourth_sixth': obj.fourth_sixth,
+                    'fifth_sixth': obj.fifth_sixth,
                     }
 
         return json.JSONEncoder.default(self, obj)
@@ -106,8 +108,10 @@ class AgeInfo:
             self._65_plus = age_data
         self.average = None
         self.stddev = None
-        self.first_quart = None
-        self.third_quart = None
+        self.first_sixth = None
+        self.second_sixth = None
+        self.fourth_sixth = None
+        self.fifth_sixth = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -129,8 +133,10 @@ class AgeInfo:
         self.stddev = statistics.stdev(randomized_ages, xbar=self.average)
         randomized_ages = sorted(randomized_ages)
         l = len(randomized_ages)
-        self.first_quart = randomized_ages[int(l / 4)]
-        self.third_quart = randomized_ages[int(3 * l / 4)]
+        self.first_sixth = randomized_ages[int(l / 6)]
+        self.second_sixth = randomized_ages[int(l / 3)]
+        self.fourth_sixth = randomized_ages[int(2 * l / 3)]
+        self.fifth_sixth = randomized_ages[int((5 * l) / 6)]
 
 
     def show_stuff(self):
@@ -173,8 +179,10 @@ class IncomeInfo:
         self.name = name
         self.average = None
         self.stddev = None
-        self.first_quart = None
-        self.third_quart = None
+        self.first_sixth = None
+        self.second_sixth = None
+        self.fourth_sixth = None
+        self.fifth_sixth = None
         self.create_distribution()
 
     def create_distribution(self):
@@ -193,8 +201,10 @@ class IncomeInfo:
         self.stddev = statistics.stdev(incomes)
         incomes = sorted(incomes)
         l = len(incomes)
-        self.first_quart = incomes[int(l / 4)]
-        self.third_quart = incomes[int(3 * l / 4)]
+        self.first_sixth = incomes[int(l / 6)]
+        self.second_sixth = incomes[int(l / 3)]
+        self.fourth_sixth = incomes[int(2 * l / 3)]
+        self.fifth_sixth = incomes[int((5 * l) / 6)]
 
 
 def get_all_csv_file_names():
@@ -271,7 +281,7 @@ def get_state_abbreviation_from_filename(filename):
 def update_dicts_by_thread(combined_dict, state, num, age, income, name):
     combined_dict[state][num] = {}
     combined_dict[state][num]['age'] = AgeInfo(age, name)
-    combined_dict[state][num]['income'] = IncomeInfo(income, num)
+    combined_dict[state][num]['income'] = IncomeInfo(income, name)
 
 
 def create_dictionaries():
