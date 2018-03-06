@@ -11,6 +11,7 @@ import json
 from datetime import date, datetime
 from get_bill import json_loader, json_dump
 
+
 def print_districts(filepath):
     data = json_loader(filepath)
 
@@ -23,6 +24,7 @@ def print_districts(filepath):
             elif term['type'] == 'sen':
                 print("\t%s: %s %s %s" % (term['type'], term['start'], term['end'], term['state']))
 
+
 def print_changed_districts(filepath):
     data = json_loader(filepath)
 
@@ -31,14 +33,14 @@ def print_changed_districts(filepath):
         first = True
         for term in x['terms']:
             if term['type'] == 'rep':
-                if first:
-                    district = term['district']
-                    first = False
-                elif district != term['district']:
-                    district = term['district']
-                    if term['start'] > date(2007, 12, 5).isoformat():
-                        print("%s %s %s changed district" % (
-                            x['id']['bioguide'], x['name']['first'], x['name']['last'],))
+                if term['start'] > date(2013, 1, 3).isoformat():
+                    if district != term['district']:
+                        district = term['district']
+                        if not first:
+                            print("%s %s %s changed district" % (
+                                x['id']['bioguide'], x['name']['first'], x['name']['last'],))
+                        first = False
+
 
 def print_recent_districts(filepath):
     data = json_loader(filepath)
@@ -51,7 +53,8 @@ def print_recent_districts(filepath):
                     print("\t%s: %s %s %s district %s" % (
                         term['type'], term['start'], term['end'], term['state'], term['district']))
 
-#not deleting terms
+
+# not deleting terms
 def trim(filepath):
     data = json_loader(filepath)
 
@@ -117,6 +120,21 @@ repID:
 '''
 
 
+def get_districts(filepath, repID):
+    data = json_loader(filepath)
+
+    districts = []
+
+    for x in data:
+        id = x['id']
+        if id['bioguide'] == repID:
+            for term in x['terms']:
+                if term['type'] == 'rep':
+                    if term['start'] > date(2013, 1, 3).isoformat():
+                        if term['district'] not in districts:
+                            districts.append(term['district'])
+            print(districts)
+            return districts
 
 
 def main():
@@ -127,7 +145,7 @@ def main():
     #print_changed_districts(current)
     #trim(current)
 
-    #print(get_district("B000944"))
+    get_districts(current, "B001260")
 
 
 if __name__ == "__main__":
