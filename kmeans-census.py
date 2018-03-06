@@ -12,6 +12,8 @@ __copyright__ = 'Copyright (c) 2018, Tim Woods'
 
 
 JSON_FILENAME = 'combined_data.json'
+REP_CLASS_FILENAME = 'rep_class.json'
+REP_DISTRICT_FILE = 'districts.json'
 
 A = 'age'
 I = 'income'
@@ -103,6 +105,26 @@ def plot_with_labels(np_array, labels):
     matplotlib.rc('axes', grid=False)
     matplotlib.rc('axes', facecolor='white')
     scatterplot(x, y, labels, 'Average Age', 'Average Income', 'Age v Income for Districts')
+
+
+def labels_from_rep_class_json():
+    with open(REP_CLASS_FILENAME, 'r') as class_file:
+        # key-val = repID - class
+        rep_classes = json.load(class_file)
+
+    with open(REP_DISTRICT_FILE, 'r') as l:
+        # key-val = district-repID
+        lookup = json.load(l)
+
+    reverse_lookup = [b[a] for a, b in zip(lookup.keys(), lookup.values())]
+    ordered_district = sorted(list(lookup.keys()))
+
+    output_classes = [0 for _ in range(len(rep_classes.keys()))]
+    for rep in rep_classes:
+        output_classes[ordered_district.index(reverse_lookup[rep])] = rep_classes[rep]
+
+    return output_classes
+
 
 def main():
     args = get_args()
