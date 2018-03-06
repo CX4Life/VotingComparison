@@ -1,9 +1,11 @@
 import numpy as np
 import hdbscan
+import json
 import argparse
 from sklearn.cluster import KMeans, DBSCAN
 
 SAVED_REP_FILE = 'rep_vectors.npy'
+REP_CLASS_JSON = 'rep_class.json'
 
 
 def get_args():
@@ -18,6 +20,9 @@ def get_args():
                         choices=['kmeans', 'dbscan', 'RSL', 'hdbscan'],
                         default='hdbscan',
                         help='Which clustering algorithm to use (choices: kmeans, dbscan, RSL, hdbscan)')
+    parser.add_argument('-debug',
+                        help='if used, will just print lables without writing to file',
+                        action='store_true')
     return parser.parse_args()
 
 
@@ -37,7 +42,19 @@ def cluster_reps(args, array):
 def main():
     args = get_args()
     rep_values = np.load(SAVED_REP_FILE)
-    print(cluster_reps(args, rep_values))
+    class_labels = cluster_reps(args, rep_values)
+    if args.debug:
+        print(class_labels)
+    else:
+        with open('sorted_reps.json', 'r') as sr:
+            rep_id_list = json.load(sr)
+
+        rep_id_to_class = {}
+        for i, class_label in enumerate(class_labels):
+            rep_id_to_class[rep_id_list[i]] = int(class_label)
+
+        with open(REP_CLASS_JSON, 'w') as output:
+            json.dump(rep_id_to_class, output, indent=2, sort_keys=True)
 
 
 if __name__ == '__main__':

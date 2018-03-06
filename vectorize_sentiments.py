@@ -78,6 +78,8 @@ def main():
 
     rep_arrays = numpy.array(list_of_reps)
     numpy.save(SAVE_NUMPY, rep_arrays)
+    with open('sorted_reps.json', 'w') as dump_reps:
+        json.dump(lookup_rep_index, dump_reps, indent=2)
 
 
 if __name__ == '__main__':
