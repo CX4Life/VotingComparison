@@ -7,6 +7,8 @@ current = 'rep_info/legislators-current.json'
 
 file = current
 
+nonVoting = ('AS', 'DC', 'GU', 'MP', 'PR', 'VI', 'UM')
+
 
 def print_districts():
     data = json_loader(file)
@@ -49,8 +51,14 @@ def get_districts():
         repID = id['bioguide']
         state, district = get_district(repID)
         if district is not None:
-            district = str(district).rjust(2, '0')
-            districts[repID] = state + district
+            if district not in districts:
+                district = str(district).rjust(2, '0')
+                districts[repID] = state + district
+            else:
+                print(rep + " " + district)
+
+    districts = {district: rep for rep, district in districts.items()}
+
     json_dump('districts.json', districts)
 
 
@@ -58,23 +66,16 @@ def get_districts():
 def get_district(repID):
     data = json_loader(file)
 
-    districts = []
-
     for x in data:
         id = x['id']
         if id['bioguide'] == repID:
             for term in x['terms']:
-                if term['type'] == 'rep':
-                    if term['start'] > date(2013, 1, 3).isoformat():
-                        if term['district'] not in districts:
-                            districts.append([term['start'], term['state'], term['district']])
-            # returns the most district for the rep
-            if districts:
-                index, last = max(enumerate(districts), key=operator.itemgetter(0))
-                return last[1], last[2]
+                if term['type'] == 'rep' and term['state'] not in nonVoting:
+                    if term['end'] >= date(2018, 3, 5).isoformat():
+                        #print(str(repID) + term['state'] + str(term['district']))
+                        return term['state'], term['district']
             else:
                 return None, None
-
 
 def main():
     #print_changed_districts()
