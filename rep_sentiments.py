@@ -17,6 +17,19 @@ def json_dump(filepath, data):
         json.dump(data, current, indent=4)
 
 
+'''
+repID:
+    {
+        Entity:
+            {
+                'salience' = 0
+                'score' = 0
+                'magnitude' = 0
+            }
+    }
+'''
+
+
 def get_entities(bill):
     sentiments = json_loader('sentiment_out.json')
     return sentiments.get(bill)
