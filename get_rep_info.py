@@ -10,6 +10,7 @@ district (null if sen)
 import json
 from datetime import date, datetime
 from get_bill import json_loader, json_dump
+import operator
 
 
 def print_districts(filepath):
@@ -120,7 +121,7 @@ repID:
 '''
 
 
-def get_districts(filepath, repID):
+def get_district(filepath, repID):
     data = json_loader(filepath)
 
     districts = []
@@ -132,9 +133,11 @@ def get_districts(filepath, repID):
                 if term['type'] == 'rep':
                     if term['start'] > date(2013, 1, 3).isoformat():
                         if term['district'] not in districts:
-                            districts.append(term['district'])
-            print(districts)
-            return districts
+                            districts.append([term['start'], term['district']])
+            #print(districts)
+            # returns the most district for the rep
+            index, last = max(enumerate(districts), key=operator.itemgetter(0))
+            return last[1]
 
 
 def main():
@@ -142,10 +145,10 @@ def main():
     historic = 'rep_info/legislators-historical.json'
     current = 'rep_info/legislators-current.json'
 
-    #print_changed_districts(current)
+    print_changed_districts(current)
     #trim(current)
 
-    get_districts(current, "B001260")
+    get_district(current, "H001065")
 
 
 if __name__ == "__main__":
