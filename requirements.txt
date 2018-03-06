@@ -1,0 +1,5 @@
+numpy
+hdbscan
+matplotlib
+sklearn
+scipy

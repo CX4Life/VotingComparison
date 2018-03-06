@@ -74,9 +74,11 @@ class Encoder (json.JSONEncoder):
             return {'name': obj.name,
                     'average': obj.average,
                     'stddev': obj.stddev,
-                    'first_quart': obj.first_quart,
+                    'first_sixth': obj.first_sixth,
+                    'second_sixth': obj.second_sixth,
                     'median': obj.median,
-                    'third_quart': obj.third_quart
+                    'fourth_sixth': obj.fourth_sixth,
+                    'fifth_sixth': obj.fifth_sixth,
                     }
 
         return json.JSONEncoder.default(self, obj)
@@ -279,7 +281,7 @@ def get_state_abbreviation_from_filename(filename):
 def update_dicts_by_thread(combined_dict, state, num, age, income, name):
     combined_dict[state][num] = {}
     combined_dict[state][num]['age'] = AgeInfo(age, name)
-    combined_dict[state][num]['income'] = IncomeInfo(income, num)
+    combined_dict[state][num]['income'] = IncomeInfo(income, name)
 
 
 def create_dictionaries():
