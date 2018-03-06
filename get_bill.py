@@ -30,7 +30,7 @@ PATH_TO_BILLS = USER_HOME_DIR + '/PycharmProjects' + '/congress/data'
   }
   '''
 
-
+# Returns bill text
 def get_bill(congress, num, bill_type):
     bill_text = None
     try:
@@ -49,6 +49,7 @@ def get_bill(congress, num, bill_type):
     return bill_text
 
 
+# creates a JSON of all house bill texts
 def build_bill_json():
     d = {}
 
@@ -81,8 +82,6 @@ def build_bill_json():
                             raise ValueError("No data for get_bill")
 
     json_dump(VOTING_COMPARISON_DIR + "/bill_summaries.json", d)
-
-
 
 
 def main():

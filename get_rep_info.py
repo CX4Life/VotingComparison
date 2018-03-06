@@ -21,6 +21,7 @@ def print_districts():
                 print("\t%s: %s %s %s" % (term['type'], term['start'], term['end'], term['state']))
 
 
+# Print a list of all reps that changed their districts in 113th congress and later
 def print_changed_districts():
     data = json_loader(file)
 
@@ -37,8 +38,7 @@ def print_changed_districts():
                                 x['id']['bioguide'], x['name']['first'], x['name']['last'],))
                         first = False
 
-
-
+# Write all repIDs and a string containing state and district (Ex: 'WA02')
 def get_districts():
     data = json_loader(file)
 
@@ -54,6 +54,7 @@ def get_districts():
     json_dump('districts.json', districts)
 
 
+# return state (ex: 'WA') and district number
 def get_district(repID):
     data = json_loader(file)
 
@@ -72,15 +73,12 @@ def get_district(repID):
                 index, last = max(enumerate(districts), key=operator.itemgetter(0))
                 return last[1], last[2]
             else:
-                #print("Error: shouldn't reach here")
                 return None, None
 
 
 def main():
     #print_changed_districts()
-    #trim(current)
-
-    #get_district("L000560")
+    #print(get_district("L000560"))
     get_districts()
 
 

@@ -35,6 +35,7 @@ def get_entities(bill):
     return sentiments.get(bill)
 
 
+# Combine all sentiment values from get_entities() for all bills for each rep
 def rep_votes():
     rep_sentiment = {}
 
@@ -97,6 +98,7 @@ def rep_votes():
     json_dump(VOTING_COMPARISON_DIR + "/rep_sentiments.json", rep_sentiment)
 
 
+# Add or subtract sentiment score for a rep
 def process_vote(rep_sentiment, repID, add, entities):
     if repID in rep_sentiment:
         current_rep = rep_sentiment[repID]
@@ -120,6 +122,7 @@ def process_vote(rep_sentiment, repID, add, entities):
     return rep_sentiment
 
 
+# Prints duplicates found with algorithm of rep_votes()
 def check_duplicates():
     bills = {}
 
