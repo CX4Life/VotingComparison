@@ -2,9 +2,14 @@ from datetime import date, datetime
 from get_bill import json_loader, json_dump
 import operator
 
+historic = 'rep_info/legislators-historical.json'
+current = 'rep_info/legislators-current.json'
 
-def print_districts(filepath):
-    data = json_loader(filepath)
+file = current
+
+
+def print_districts():
+    data = json_loader(file)
 
     for x in data:
         print("%s %s %s" % (x['id']['bioguide'], x['name']['first'], x['name']['last'],))
@@ -16,8 +21,8 @@ def print_districts(filepath):
                 print("\t%s: %s %s %s" % (term['type'], term['start'], term['end'], term['state']))
 
 
-def print_changed_districts(filepath):
-    data = json_loader(filepath)
+def print_changed_districts():
+    data = json_loader(file)
 
     for x in data:
         district = 0
@@ -33,8 +38,8 @@ def print_changed_districts(filepath):
                         first = False
 
 
-def get_district(filepath, repID):
-    data = json_loader(filepath)
+def get_district(repID):
+    data = json_loader(file)
 
     districts = []
 
@@ -53,14 +58,10 @@ def get_district(filepath, repID):
 
 
 def main():
-    #sample = 'rep_info/legislators-sample.json'
-    historic = 'rep_info/legislators-historical.json'
-    current = 'rep_info/legislators-current.json'
-
-    print_changed_districts(current)
+    print_changed_districts()
     #trim(current)
 
-    get_district(current, "H001065")
+    get_district("H001065")
 
 
 if __name__ == "__main__":
