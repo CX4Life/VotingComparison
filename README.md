@@ -1,7 +1,7 @@
-#Voting Comparison Project
+# Voting Comparison Project
 _Comparing the voting pattern of citizens to their Congressional Representative_
 
-###Bird's Eye View
+### Bird's Eye View
 - Scrape the [Congress.gov](https://www.congress.gov/roll-call-votes) listing of role call votes in the US House of Representatives
 and the Senate between now and *2008 (subject to change)*
 - Grab the voting history of Congressional districts for the same period of time from the
@@ -16,7 +16,7 @@ or against those sentiments
 - Evaluate the similarity between Congressional district and its representative
 
 
-###History
+### History
 
 - 2-7-2018 At the suggestion of Dr. Hearne, looking to find some
 subset of census data to use to build up a profile of citizens in a
